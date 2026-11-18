@@ -1,0 +1,35 @@
+name: 3D-Vorschau
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Blender installieren
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq blender ffmpeg > /dev/null
+          blender --version | head -1
+          pip install -q pillow
+      - name: Probe-Bilder rendern
+        run: time python tests/preview_shots.py
+      - name: Bilder in Branch "preview" speichern
+        run: |
+          cd preview/img
+          ffmpeg -v error -y -i shot_%02d.png -vf "scale=360:-1,tile=4x2" -frames:v 1 ../sheet.jpg || true
+          cd ../..
+          git config user.name "story-bot"; git config user.email "story-bot@users.noreply.github.com"
+          git checkout --orphan preview-out
+          git rm -rfq --cached .
+          git add -f preview/img/*.png preview/sheet.jpg
+          git commit -qm "3D-Vorschau"
+          git push -f origin preview-out:preview
