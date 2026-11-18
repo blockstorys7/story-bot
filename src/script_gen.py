@@ -12,7 +12,7 @@ def _call(prov: str, model: str, prompt: str) -> str:
     if prov == "gemini":
         r = requests.post(
             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-            params={"key": env("GEMINI_API_KEY")}, timeout=300,
+            params={"key": env("GEMINI_API_KEY")}, timeout=120,
             json={"contents": [{"parts": [{"text": prompt}]}],
                   "generationConfig": {"responseMimeType": "application/json", "temperature": 1.0}})
         r.raise_for_status()
@@ -137,7 +137,7 @@ def generate_script(cfg: dict, bible: dict, history: list, part: int) -> dict:
         bible=json.dumps(bible, ensure_ascii=False, indent=1),
         history="\n".join(f"Part {i+1}: {s}" for i, s in enumerate(history)) or "(keine – dies ist der Anfang)",
         part=part, total=total, language=cfg["language"], seconds=seconds,
-        words=int(seconds * 2.6), recap=recap, ending=ending,
+        words=int(seconds * 2.4), recap=recap, ending=ending,
     )
     script = llm(cfg, prompt)
     script["part"] = part
@@ -158,6 +158,23 @@ Antworte NUR mit JSON:
 {{"title": "...", "premise": "...", "tone": "...",
   "characters": [{{"id": "kurz_ohne_leerzeichen", "name": "...", "spec": {{"skin": "#...", "eye_color": "#...", "hair": "spiky", "hair_color": "#...", "hat": "none", "outfit": "suit", "top": "#...", "shirt": "#...", "trim": "#...", "pants": "#...", "shoes": "#..."}}}}],
   "sets": "street, facade, room, jail, meadow, sign"}}"""
+
+
+SHORTEN_PROMPT = """Hier ist ein Drehbuch als JSON. Es ist zu lang ({have} Wörter gesprochen). Kürze die Erzählung auf höchstens {want} Wörter:
+streiche unwichtige Szenen ganz oder kürze Sätze, aber behalte Hook, roten Faden und das Ende/den Cliffhanger.
+Behalte exakt dasselbe JSON-Format mit allen Feldern pro Szene. Antworte NUR mit dem JSON.
+
+{script}"""
+
+
+def shorten_script(cfg: dict, script: dict, want: int) -> dict:
+    have = len(" ".join(s["narration"] for s in script["scenes"]).split())
+    out = llm(cfg, SHORTEN_PROMPT.format(have=have, want=want, script=json.dumps(script, ensure_ascii=False)))
+    if not out.get("scenes"):
+        return script
+    for k in ("caption", "hashtags", "summary", "part"):
+        out.setdefault(k, script.get(k))
+    return out
 
 
 def generate_series_bible(cfg: dict, previous_titles: list) -> dict:

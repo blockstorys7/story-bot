@@ -108,6 +108,15 @@ def generate(cfg) -> dict:
             retry_script = generate_script(longer, bible, [p["summary"] for p in ser["parts"]], part)
             if len(" ".join(s["narration"] for s in retry_script["scenes"]).split()) > n_words:
                 script = retry_script
+        # Zu lang? (Instagram-API: max. 90 s) -> kürzen lassen
+        max_words = int(cfg.get("max_seconds", 88) * 2.6)
+        for _ in range(2):
+            n_words = len(" ".join(s["narration"] for s in script["scenes"]).split())
+            if n_words <= max_words:
+                break
+            print(f"  Drehbuch zu lang ({n_words} Wörter) – wird gekürzt …", flush=True)
+            from script_gen import shorten_script
+            script = shorten_script(cfg, script, int(cfg["target_seconds"] * 2.5))
         write_json(work / "script.json", script)
     scenes = [s for s in script["scenes"] if s.get("narration", "").strip()]
     print(f"  {len(scenes)} Szenen", flush=True)
@@ -121,6 +130,8 @@ def generate(cfg) -> dict:
     narr = [s["narration"].strip() for s in scenes]
     times = scene_timings(narr, words, probe_duration(voice))
     speech_end = times[-1][1]
+    if speech_end > cfg.get("max_seconds", 88):
+        print(f"  ! Sprechtext {speech_end:.0f}s – länger als max_seconds", flush=True)
     missing = cfg["min_seconds"] - speech_end
     if missing > 0:  # Mindestlänge garantieren: Endkarte
         print(f"  +{missing:.1f}s Endkarte für Mindestlänge", flush=True)

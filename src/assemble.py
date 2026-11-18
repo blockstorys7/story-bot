@@ -71,7 +71,7 @@ Style: Part,{r['font']},{int(r['font_size']*0.8)},&H00FFFFFF,&H00FFFFFF,&H000000
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     lines = []
-    label = "FINALE" if part == total else f"PART {part}"
+    label = "FINALE" if part == total else f"TEIL {part}"
     lines.append(f"Dialogue: 1,{_ts(0)},{_ts(2.8)},Part,,0,0,0,,{{\\3c&H2020E0&\\fad(150,250)}}{label}")
     y = int(H * 0.58)
     for i, w in enumerate(words):

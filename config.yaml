@@ -5,6 +5,7 @@
 language: de            # Sprache von Erzählung & Untertiteln (de, en, ...)
 target_seconds: 78      # Ziel-Sprechlänge (Reels-API erlaubt max. 90 s)
 min_seconds: 62         # Video wird NIE kürzer (TikTok Creator Rewards zählt nur Videos > 1 min)
+max_seconds: 88         # und nicht länger (Instagram-API erlaubt max. 90 s)
 parts_per_series: 8     # Teile pro Story (8 = bei 4 Videos/Tag genau 2 Tage)
 end_text: "TEIL {n} FOLGT…"   # Endkarte, falls die Erzählung kürzer als min_seconds ist
 end_text_final: "ENDE"
