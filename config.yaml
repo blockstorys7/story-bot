@@ -1,0 +1,55 @@
+# ---------------------------------------------------------------
+#  AI Story Bot – Konfiguration
+# ---------------------------------------------------------------
+
+language: de            # Sprache von Erzählung & Untertiteln (de, en, ...)
+target_seconds: 72      # >60 s, damit TikTok Creator Rewards zählt; Reels-API max. 90 s
+parts_per_series: 5     # Wie viele Parts eine Story hat, bevor eine neue beginnt
+
+# Stil der KI-Hintergründe (Figuren zeichnet der Code selbst -> immer gleich)
+background_style: >
+  3D video game environment render, low-poly blocky game world, simple clean
+  textures, soft global illumination, cinematic camera angle, eye level,
+  vertical 9:16 composition, no text, no logos, no watermark
+
+# --- KI-Modelle -------------------------------------------------
+# Voreinstellung = 0-€-MODUS. Wenn Geld reinkommt, unten auf die
+# "Upgrade"-Werte umstellen (bessere Figuren-Konsistenz + echte Animation).
+llm:
+  provider: gemini                  # gratis | Upgrade: anthropic
+  model: gemini-flash-latest        # bei anthropic: claude-sonnet-5-5
+image:
+  provider: pollinations            # gratis | Upgrade: fal
+  free_model: flux
+  model: fal-ai/nano-banana         # nur bei provider: fal
+  edit_model: fal-ai/nano-banana/edit
+video:
+  enabled: false                    # gratis = Code-Animation | Upgrade: true (Kling animiert die fertigen Szenen)
+  model: fal-ai/kling-video/v2.5-turbo/pro/image-to-video
+  max_clips_per_part: 6             # nur die wichtigsten Szenen werden animiert
+  clip_seconds: "5"
+tts:
+  provider: edge                    # gratis (Microsoft-Edge-Stimmen) | Upgrade: elevenlabs
+  edge_voice: de-DE-ConradNeural    # englisch z.B. en-US-AndrewNeural, en-US-GuyNeural
+  edge_rate: "+8%"
+  voice_id: "pNInz6obpgDQGcFmaJgB"  # beliebige ElevenLabs-Stimme
+  model: eleven_multilingual_v2
+  speed: 1.08
+
+# --- Schnitt ----------------------------------------------------
+render:
+  width: 1080
+  height: 1920
+  fps: 30
+  font: "Montserrat"
+  font_size: 92
+  music: assets/music.mp3           # optional (z.B. YouTube Audio Library, gratis), leise im Hintergrund (lizenzfreie Musik!)
+  music_volume: 0.12
+
+# --- Veröffentlichen --------------------------------------------
+publish:
+  tiktok: true
+  instagram: true
+  tiktok_privacy: PUBLIC_TO_EVERYONE   # vor dem TikTok-Audit wird das erzwungen auf SELF_ONLY
+  instagram_api_version: v23.0
+  ai_label_hashtag: "#aigenerated"

@@ -1,0 +1,40 @@
+name: TikTok verbinden
+
+# Schritt 1: ohne Eingabe starten -> Link steht in der Zusammenfassung.
+# Schritt 2: Link öffnen, erlauben, die komplette Adresse aus der Adresszeile kopieren
+#            und den Workflow erneut mit dieser Adresse starten.
+on:
+  workflow_dispatch:
+    inputs:
+      weiterleitungs_url:
+        description: "Leer lassen für den Login-Link – danach hier die Adresse nach dem Erlauben einfügen"
+        required: false
+        default: ""
+
+jobs:
+  auth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q -r requirements.txt
+      - name: TikTok
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REDIRECT_URI: ${{ secrets.TIKTOK_REDIRECT_URI }}
+          TOKENS_JSON: ${{ secrets.TOKENS_JSON }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          BACK_URL: ${{ inputs.weiterleitungs_url }}
+        run: |
+          if [ -z "$BACK_URL" ]; then
+            LINK=$(python src/publish_tiktok.py link)
+            echo "### 1. Diesen Link öffnen und erlauben:" >> $GITHUB_STEP_SUMMARY
+            echo "$LINK" >> $GITHUB_STEP_SUMMARY
+            echo "### 2. Danach die komplette Adresse kopieren und diesen Workflow erneut starten." >> $GITHUB_STEP_SUMMARY
+          else
+            python src/publish_tiktok.py exchange "$BACK_URL"
+            echo "### ✅ TikTok verbunden" >> $GITHUB_STEP_SUMMARY
+          fi

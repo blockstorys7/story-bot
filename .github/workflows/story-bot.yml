@@ -1,0 +1,64 @@
+name: Story Bot
+
+on:
+  schedule:
+    - cron: "7 17 * * *"   # täglich 18:07 Uhr deutscher Winterzeit (UTC-Zeit +1)
+  workflow_dispatch: {}    # "Run workflow"-Knopf zum sofortigen Starten
+
+permissions:
+  contents: write          # um den Serien-Fortschritt zu speichern
+
+concurrency:
+  group: story-bot
+  cancel-in-progress: false
+
+jobs:
+  part:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Werkzeuge installieren
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          pip install -q -r requirements.txt
+
+      - name: Part erstellen und hochladen
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          POLLINATIONS_KEY: ${{ secrets.POLLINATIONS_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REDIRECT_URI: ${{ secrets.TIKTOK_REDIRECT_URI }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          TOKENS_JSON: ${{ secrets.TOKENS_JSON }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: python src/main.py run
+
+      - name: Fortschritt speichern
+        if: always()
+        run: |
+          git config user.name "story-bot"
+          git config user.email "story-bot@users.noreply.github.com"
+          git add series/
+          git diff --cached --quiet || git commit -m "Story-Fortschritt $(date -u +%F)"
+          git push
+
+      - name: Video zum Anschauen bereitstellen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: video
+          path: output/**/final.mp4
+          retention-days: 7
+          if-no-files-found: ignore
