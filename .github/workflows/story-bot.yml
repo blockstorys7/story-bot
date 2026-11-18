@@ -2,7 +2,12 @@ name: Story Bot
 
 on:
   schedule:
-    - cron: "7 17 * * *"   # täglich 18:07 Uhr deutscher Winterzeit (UTC-Zeit +1)
+    # 3x täglich. Zeiten in UTC (Winter: deutsche Zeit -1 h). GitHub startet oft ein paar
+    # Minuten später, darum kurz vor der vollen Stunde angesetzt.
+    # Im Sommer (ab Ende März) jeweils eine Stunde früher eintragen: 7:57 / 13:27 / 17:57
+    - cron: "57 8 * * *"   # ca. 10:00 Uhr deutscher Zeit
+    - cron: "27 14 * * *"  # ca. 15:30 Uhr
+    - cron: "57 18 * * *"  # ca. 20:00 Uhr
   workflow_dispatch:       # "Run workflow"-Knopf zum sofortigen Starten
     inputs:
       modus:

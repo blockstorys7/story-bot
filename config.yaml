@@ -3,8 +3,11 @@
 # ---------------------------------------------------------------
 
 language: de            # Sprache von Erzählung & Untertiteln (de, en, ...)
-target_seconds: 72      # >60 s, damit TikTok Creator Rewards zählt; Reels-API max. 90 s
-parts_per_series: 5     # Wie viele Parts eine Story hat, bevor eine neue beginnt
+target_seconds: 78      # Ziel-Sprechlänge (Reels-API erlaubt max. 90 s)
+min_seconds: 62         # Video wird NIE kürzer (TikTok Creator Rewards zählt nur Videos > 1 min)
+parts_per_series: 5
+end_text: "TEIL {n} FOLGT…"   # Endkarte, falls die Erzählung kürzer als min_seconds ist
+end_text_final: "ENDE"     # Wie viele Parts eine Story hat, bevor eine neue beginnt
 
 # Stil der KI-Hintergründe (Figuren zeichnet der Code selbst -> immer gleich)
 background_style: >

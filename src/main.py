@@ -69,6 +69,14 @@ def generate(cfg) -> dict:
     if not script:
         print("Drehbuch …")
         script = generate_script(cfg, bible, [p["summary"] for p in ser["parts"]], part)
+        # Zu kurzes Drehbuch? Einmal neu schreiben lassen (~2,6 gesprochene Wörter pro Sekunde)
+        n_words = len(" ".join(s["narration"] for s in script["scenes"]).split())
+        if n_words < cfg["min_seconds"] * 2.4:
+            print(f"  Drehbuch zu kurz ({n_words} Wörter) – wird verlängert …")
+            longer = dict(cfg, target_seconds=cfg["target_seconds"] + 12)
+            retry_script = generate_script(longer, bible, [p["summary"] for p in ser["parts"]], part)
+            if len(" ".join(s["narration"] for s in retry_script["scenes"]).split()) > n_words:
+                script = retry_script
         write_json(work / "script.json", script)
     scenes = script["scenes"]
 
@@ -82,6 +90,11 @@ def generate(cfg) -> dict:
         words = synthesize(cfg, " ".join(s["narration"] for s in scenes), voice)
         write_json(work / "words.json", words)
     times = scene_timings([s["narration"] for s in scenes], words, probe_duration(voice))
+    # Mindestlänge garantieren: letzte Szene verlängern, dazu Endkarte "Teil X folgt"
+    missing = cfg["min_seconds"] - times[-1][1]
+    if missing > 0:
+        print(f"  +{missing:.1f}s Endkarte für Mindestlänge")
+        times[-1] = (times[-1][0], times[-1][1] + missing)
 
     print("Szenen animieren …")
     animate = set()
@@ -99,7 +112,9 @@ def generate(cfg) -> dict:
             segments.append((dest, e - s))
 
     print("Schnitt …")
-    final = assemble(cfg, segments, voice, words, part, total, work, work / "final.mp4", ROOT)
+    end_from = scene_timings([s["narration"] for s in scenes], words, probe_duration(voice))[-1][1] - 0.5
+    final = assemble(cfg, segments, voice, words, part, total, work, work / "final.mp4", ROOT,
+                     end_card=(end_from, times[-1][1]))
 
     tags = " ".join("#" + t.lstrip("#").replace(" ", "") for t in script.get("hashtags", []))
     entry = {"part": part, "dir": str(work.relative_to(ROOT)), "summary": script["summary"],

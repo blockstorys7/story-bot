@@ -53,7 +53,7 @@ def _ts(t: float) -> str:
     return f"{int(t // 3600)}:{int(t % 3600 // 60):02d}:{t % 60:05.2f}"
 
 
-def write_ass(cfg, words: list, part: int, total: int, dest: Path):
+def write_ass(cfg, words: list, part: int, total: int, dest: Path, end_card=None):
     r = cfg["render"]
     W, H = r["width"], r["height"]
     head = f"""[Script Info]
@@ -79,11 +79,16 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         txt = w["word"].replace("{", "(").replace("}", ")").replace("\\", "")
         pop = "{\\pos(%d,%d)\\fscx75\\fscy75\\t(0,90,\\fscx100\\fscy100)}" % (W // 2, y)
         lines.append(f"Dialogue: 0,{_ts(w['start'])},{_ts(end)},Word,,0,0,0,,{pop}{txt}")
+    if end_card and end_card[1] - end_card[0] > 0.8:
+        txt = (cfg.get("end_text_final", "ENDE") if part == total
+               else cfg.get("end_text", "TEIL {n} FOLGT…").format(n=part + 1))
+        lines.append(f"Dialogue: 2,{_ts(end_card[0])},{_ts(end_card[1])},Part,,0,0,0,,"
+                     f"{{\\an5\\pos({W // 2},{int(H * 0.42)})\\fscx130\\fscy130\\3c&H2020E0&\\fad(250,0)}}{txt}")
     dest.write_text(head + "\n".join(lines) + "\n", encoding="utf-8")
 
 
 def assemble(cfg, segments: list, voice: Path, words: list, part: int, total: int,
-             work: Path, out: Path, root: Path):
+             work: Path, out: Path, root: Path, end_card=None):
     """segments = [(quelle_bild_oder_clip, dauer), ...]"""
     seg_files = []
     for i, (src, dur) in enumerate(segments):
@@ -99,7 +104,7 @@ def assemble(cfg, segments: list, voice: Path, words: list, part: int, total: in
     ff("-f", "concat", "-safe", 0, "-i", lst, "-c", "copy", raw)
 
     ass = work / "captions.ass"
-    write_ass(cfg, words, part, total, ass)
+    write_ass(cfg, words, part, total, ass, end_card)
     ass_arg = str(ass.resolve()).replace("\\", "/").replace(":", "\\:")
     fonts = str((root / "assets" / "fonts").resolve()).replace(":", "\\:")
     ass_arg = f"{ass_arg}':fontsdir='{fonts}"
