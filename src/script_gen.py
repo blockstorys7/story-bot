@@ -8,41 +8,48 @@ import requests
 from common import env, retry
 
 
-def llm(cfg: dict, prompt: str) -> dict:
-    """Ruft das konfigurierte Sprachmodell auf und gibt geparstes JSON zurück.
-    provider: gemini (gratis-Kontingent) | pollinations (gratis) | anthropic (bezahlt)"""
-    prov = cfg["llm"].get("provider", "gemini")
-
-    def call() -> str:
-        if prov == "gemini":
-            r = requests.post(
-                f"https://generativelanguage.googleapis.com/v1beta/models/{cfg['llm']['model']}:generateContent",
-                params={"key": env("GEMINI_API_KEY")}, timeout=180,
-                json={"contents": [{"parts": [{"text": prompt}]}],
-                      "generationConfig": {"responseMimeType": "application/json", "temperature": 1.0}})
-            r.raise_for_status()
-            return "".join(p.get("text", "") for p in r.json()["candidates"][0]["content"]["parts"])
-        if prov == "pollinations":
-            h = {"Content-Type": "application/json"}
-            if os.environ.get("POLLINATIONS_KEY"):
-                h["Authorization"] = f"Bearer {os.environ['POLLINATIONS_KEY']}"
-            r = requests.post("https://text.pollinations.ai/openai", headers=h, timeout=300, json={
-                "model": cfg["llm"].get("model", "openai"),
-                "messages": [{"role": "user", "content": prompt}]})
-            r.raise_for_status()
-            return r.json()["choices"][0]["message"]["content"]
+def _call(prov: str, model: str, prompt: str) -> str:
+    if prov == "gemini":
         r = requests.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={"x-api-key": env("ANTHROPIC_API_KEY"), "anthropic-version": "2023-06-01",
-                     "content-type": "application/json"},
-            json={"model": cfg["llm"]["model"], "max_tokens": 4000,
-                  "messages": [{"role": "user", "content": prompt}]}, timeout=180)
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+            params={"key": env("GEMINI_API_KEY")}, timeout=150,
+            json={"contents": [{"parts": [{"text": prompt}]}],
+                  "generationConfig": {"responseMimeType": "application/json", "temperature": 1.0}})
         r.raise_for_status()
-        return "".join(b.get("text", "") for b in r.json()["content"])
+        return "".join(p.get("text", "") for p in r.json()["candidates"][0]["content"]["parts"])
+    if prov == "pollinations":
+        h = {"Content-Type": "application/json"}
+        if os.environ.get("POLLINATIONS_KEY"):
+            h["Authorization"] = f"Bearer {os.environ['POLLINATIONS_KEY']}"
+        r = requests.post("https://text.pollinations.ai/openai", headers=h, timeout=300, json={
+            "model": model, "messages": [{"role": "user", "content": prompt}]})
+        r.raise_for_status()
+        return r.json()["choices"][0]["message"]["content"]
+    r = requests.post(
+        "https://api.anthropic.com/v1/messages",
+        headers={"x-api-key": env("ANTHROPIC_API_KEY"), "anthropic-version": "2023-06-01",
+                 "content-type": "application/json"},
+        json={"model": model, "max_tokens": 4000, "messages": [{"role": "user", "content": prompt}]},
+        timeout=180)
+    r.raise_for_status()
+    return "".join(b.get("text", "") for b in r.json()["content"])
 
-    def parsed():
-        return json.loads(re.search(r"\{.*\}", call(), re.S).group(0))
-    return retry(parsed, tries=4, wait=20)  # Gratis-Tarife haben enge Minutenlimits
+
+def llm(cfg: dict, prompt: str) -> dict:
+    """Probiert das Hauptmodell und dann die Ausweichmodelle (z.B. wenn Gemini überlastet ist)."""
+    chain = [(cfg["llm"].get("provider", "gemini"), cfg["llm"]["model"])]
+    chain += [tuple(x.split(":", 1)) for x in cfg["llm"].get("fallbacks", [])]
+    last = None
+    for prov, model in chain:
+        print(f"  Sprachmodell: {prov}/{model}")
+        try:
+            return retry(lambda: json.loads(re.search(r"\{.*\}", _call(prov, model, prompt), re.S).group(0)),
+                         tries=2, wait=15)
+        except Exception as e:  # noqa: BLE001
+            last = e
+            print(f"  ! {prov}/{model} nicht verfügbar – nächstes Modell")
+    raise RuntimeError(f"Kein Sprachmodell erreichbar: {last}")
+
 
 PROMPT = """Du schreibst virale Kurzvideo-Serien (TikTok/Reels): animierte Geschichten mit blockigen 3D-Spielfiguren und Erzählerstimme.
 
