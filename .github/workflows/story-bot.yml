@@ -97,6 +97,17 @@ jobs:
           git diff --cached --quiet || git commit -m "Story-Fortschritt $(date -u +%F)"
           git push
 
+      - name: Testvideo im Branch "preview" ablegen
+        if: always() && inputs.modus == 'generate'
+        run: |
+          f=$(ls output/*/part_*/final.mp4 2>/dev/null | head -1)
+          [ -z "$f" ] && exit 0
+          mkdir -p /tmp/pv && cp "$f" /tmp/pv/final.mp4 && cp "$(dirname $f)/script.json" /tmp/pv/ || true
+          ffmpeg -v error -y -i /tmp/pv/final.mp4 -vf "fps=1/3,scale=180:-1,tile=8x4" -frames:v 1 /tmp/pv/sheet.jpg || true
+          git config user.name "story-bot"; git config user.email "story-bot@users.noreply.github.com"
+          git checkout -q --orphan pv-video && git rm -rfq --cached . && rm -rf preview && mkdir preview && cp /tmp/pv/* preview/
+          git add -f preview && git commit -qm "Testvideo" && git push -qf origin pv-video:preview
+
       - name: Video zum Anschauen bereitstellen
         if: always()
         uses: actions/upload-artifact@v4
