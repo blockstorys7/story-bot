@@ -3,26 +3,102 @@
   "premise": "Eine bunte Kleinstadt, in der der Bürgermeister jeden Tag eine neue, völlig absurde Regel erfindet. Wer sie bricht, landet sofort im Gefängnis. Kai, ein schlagfertiger Junge mit silbernen Haaren, versucht jede Regel auszutricksen – und landet trotzdem ständig hinter Gittern. Jeder Teil ist eine Regel oder ein Ausbruchsversuch, mit überraschender Pointe.",
   "tone": "schnell, witzig, absurd, wie ein Erzähler, der einem Freund eine verrückte Geschichte erzählt. Kurze Sätze, viele Pointen, Präteritum ('In dieser Stadt hat der Bürgermeister eine neue Regel gemacht…')",
   "characters": [
-    {"id": "kai", "name": "Kai",
-     "spec": {"skin": "#f3d2b5", "eye_color": "#e8862a", "hair": "spiky", "hair_color": "#eef1f6", "outfit": "suit",
-              "top": "#17171c", "shirt": "#f5f5f5", "trim": "#c8202c", "pants": "#17171c", "shoes": "#0d0d0f"}},
-    {"id": "polizist", "name": "Der Polizist",
-     "spec": {"skin": "#6b4630", "eye_color": "#3a2a20", "hair": "short", "hair_color": "#1a1410", "hat": "police",
-              "hat_color": "#1f2d6b", "outfit": "uniform", "top": "#1b1b22", "shirt": "#1b1b22", "tie": "#0e0e10",
-              "pants": "#1b1b22", "shoes": "#0d0d0f"}},
-    {"id": "buergermeister", "name": "Der Bürgermeister",
-     "spec": {"skin": "#f1c9a5", "eye_color": "#5a3a28", "hair": "short", "hair_color": "#5a3a28", "hat": "tophat",
-              "hat_color": "#151518", "outfit": "suit", "top": "#151518", "shirt": "#ffffff", "tie": "#a01c24",
-              "trim": "#a01c24", "pants": "#151518"}},
-    {"id": "lena", "name": "Lena",
-     "spec": {"skin": "#f6dcc4", "eye_color": "#3d7fd6", "hair": "long", "hair_color": "#f0d488", "outfit": "hoodie",
-              "top": "#f2f2f2", "pants": "#4a6fa5", "shoes": "#f2f2f2"}},
-    {"id": "baecker", "name": "Der Bäcker",
-     "spec": {"skin": "#e9b98f", "eye_color": "#4a3020", "hair": "messy", "hair_color": "#c2562a", "outfit": "tshirt",
-              "shirt": "#3ec6b8", "pants": "#2c3e66", "shoes": "#222222"}},
-    {"id": "mo", "name": "Mo",
-     "spec": {"skin": "#f3d2b5", "eye_color": "#4a3020", "hair": "short", "hair_color": "#3b2a20", "hat": "beanie",
-              "hat_color": "#9cc8f0", "outfit": "tshirt", "shirt": "#a9d1f5", "pants": "#a9d1f5", "shoes": "#ffffff"}}
+    {
+      "id": "kai",
+      "name": "Kai",
+      "spec": {
+        "skin": "#f3d2b5",
+        "eye_color": "#e8862a",
+        "hair": "spiky",
+        "hair_color": "#eef1f6",
+        "outfit": "suit",
+        "top": "#17171c",
+        "shirt": "#f5f5f5",
+        "trim": "#c8202c",
+        "pants": "#17171c",
+        "shoes": "#0d0d0f"
+      }
+    },
+    {
+      "id": "polizist",
+      "name": "Der Polizist",
+      "spec": {
+        "skin": "#6b4630",
+        "eye_color": "#3a2a20",
+        "hair": "short",
+        "hair_color": "#1a1410",
+        "hat": "police",
+        "hat_color": "#1f2d6b",
+        "outfit": "uniform",
+        "top": "#1b1b22",
+        "shirt": "#1b1b22",
+        "tie": "#0e0e10",
+        "pants": "#1b1b22",
+        "shoes": "#0d0d0f"
+      }
+    },
+    {
+      "id": "buergermeister",
+      "name": "Der Bürgermeister",
+      "spec": {
+        "skin": "#f1c9a5",
+        "eye_color": "#5a3a28",
+        "hair": "short",
+        "hair_color": "#5a3a28",
+        "hat": "tophat",
+        "hat_color": "#151518",
+        "outfit": "suit",
+        "top": "#151518",
+        "shirt": "#ffffff",
+        "tie": "#a01c24",
+        "trim": "#a01c24",
+        "pants": "#151518"
+      }
+    },
+    {
+      "id": "lena",
+      "name": "Lena",
+      "spec": {
+        "skin": "#f6dcc4",
+        "eye_color": "#3d7fd6",
+        "hair": "long",
+        "hair_color": "#f0d488",
+        "outfit": "hoodie",
+        "top": "#e84a8a",
+        "pants": "#2f3f7a",
+        "shoes": "#f2f2f2"
+      }
+    },
+    {
+      "id": "baecker",
+      "name": "Der Bäcker",
+      "spec": {
+        "skin": "#e9b98f",
+        "eye_color": "#4a3020",
+        "hair": "messy",
+        "hair_color": "#c2562a",
+        "outfit": "tshirt",
+        "shirt": "#3ec6b8",
+        "pants": "#2c3e66",
+        "shoes": "#222222"
+      }
+    },
+    {
+      "id": "mo",
+      "name": "Mo",
+      "spec": {
+        "skin": "#f3d2b5",
+        "eye_color": "#4a3020",
+        "hair": "short",
+        "hair_color": "#3b2a20",
+        "hat": "beanie",
+        "hat_color": "#ffcf33",
+        "outfit": "tshirt",
+        "shirt": "#4f9be8",
+        "pants": "#4f9be8",
+        "shoes": "#ffffff"
+      }
+    }
   ],
   "sets": "street = Hauptstraße; facade = Gebäude mit Schild (z.B. RATHAUS, GEFÄNGNIS, SCHULE, BÄCKER); room = Innenraum (room_type: bakery/office/police/school/home/shop); jail = Gefängniszelle; meadow = Wiese außerhalb der Stadt; sign = große Tafel an Ziegelwand für Pointen (z.B. '+2 JAHRE')"
 }

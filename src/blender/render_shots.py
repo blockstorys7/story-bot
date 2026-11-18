@@ -238,9 +238,9 @@ def hair(spec, head, rng):
     if not has_hat:
         box((1.42, 1.32, 0.42), (0, 0.03, top + 0.12), hm, head, bevel=0.17, name="hair")
     box((1.42, 0.5, 1.0), (0, 0.45, top - 0.3), hm, head, bevel=0.15, name="hair")
-    for sx in (-1, 1):  # Seiten
-        box((0.16, 1.0, 0.75 if style != "long" else 1.6), (sx * 0.7, 0.1, top - 0.25 - (0.4 if style == "long" else 0)),
-            hm, head, bevel=0.06, name="hair")
+    for sx in (-1, 1):  # Seiten (schmal, nach hinten versetzt)
+        box((0.1, 0.7, 0.5 if style != "long" else 1.6), (sx * 0.68, 0.25, top - 0.15 - (0.5 if style == "long" else 0)),
+            hm, head, bevel=0.04, name="hair")
     n_front = {"spiky": 7, "messy": 8, "short": 5, "long": 6, "bun": 5}.get(style, 5)
     if has_hat:
         n_front = 0
@@ -363,7 +363,7 @@ def character(cid, spec, cfg, faces):
     # Requisiten
     prop = cfg.get("prop")
     if prop == "sign" or pose == "hold_sign":
-        board = empty((0, -0.9, 7.2), root)
+        board = empty((0, -0.9, 6.55), root)
         box((3.6, 0.12, 1.8), (0, 0, 0), mat("#f4f1ea", 0.6), board, bevel=0.04)
         lines = (cfg.get("sign_text") or "NEUE REGEL").split(":", 1)
         if len(lines) == 2:
@@ -590,10 +590,8 @@ def set_jail(shot, rng):
     area((0, -9, 5), 400, 8, (75, 0, 0))
     box((5, 1.6, 0.6), (-4.5, 5.2, 1.2), mat("#d7d2c6", 0.8), bevel=0.05)  # Pritsche
     bars = mat("#1c1d21", 0.35, 0.6, key="bars")
-    x = -7.6
-    while x <= 7.6:
-        cyl(0.07, 8.8, (x, -1.6, 4.4), bars, seg=10)
-        x += 0.55
+    for k in range(-7, 7):  # Lücke genau in der Mitte -> Gesicht sichtbar
+        cyl(0.07, 8.8, (0.6 + k * 1.15, -1.6, 4.4), bars, seg=10)
     for z in (0.3, 4.4, 8.6):
         box((16, 0.18, 0.18), (0, -1.6, z), bars, bevel=0.02)
     for i, xx in enumerate((-5, 0, 5)):
@@ -652,7 +650,7 @@ def camera(shot, chars_cfg):
     elif kind == "close":
         hx_ = focus["x"]
         hz = 4.66 + (0.0 if focus.get("pose") != "hold_sign" else 0.0)
-        pos, tgt, lens = (hx_ + side * 0.8, -4.9 + focus.get("y", 0), hz + 0.25), (hx_, focus.get("y", 0), hz - 0.35), 45
+        pos, tgt, lens = (hx_ + side * 0.5, -4.9 + focus.get("y", 0), hz + 0.05), (hx_, focus.get("y", 0), hz - 0.3), 45
         cd.dof.use_dof = True
         cd.dof.focus_distance = 4.9
         cd.dof.aperture_fstop = 2.2
@@ -661,7 +659,7 @@ def camera(shot, chars_cfg):
         signing = any(c.get("pose") == "hold_sign" for c in chars_cfg)
         dist = 8.2 if len(chars_cfg) == 1 else 10.5
         if signing:
-            dist += 3
+            dist += 1.5
         pos, tgt, lens = (cx + side * 1.2, -dist, 4.3), (cx, 0, 4.0 if not signing else 5.3), 35
         cd.dof.use_dof = True
         cd.dof.focus_distance = dist
