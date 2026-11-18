@@ -36,12 +36,36 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Werkzeuge installieren
+      - name: Systempakete
+        timeout-minutes: 8
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg libxi6 libxxf86vm1 libxfixes3 libxrender1 libxkbcommon0 libsm6 libgl1 libegl1 > /dev/null
-          curl -sL https://download.blender.org/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz | tar -xJ -C $HOME
-          echo "$HOME/blender-4.2.3-linux-x64" >> $GITHUB_PATH
-          pip install -q -r requirements.txt
+          sudo apt-get update -q -o Acquire::Retries=3
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends ffmpeg libxi6 libxxf86vm1 libxfixes3 libxrender1 libxkbcommon0 libsm6 libgl1 libegl1
+      - name: Blender aus Zwischenspeicher
+        id: bcache
+        uses: actions/cache@v4
+        with:
+          path: ~/blender
+          key: blender-4.2.3
+      - name: Blender herunterladen
+        if: steps.bcache.outputs.cache-hit != 'true'
+        timeout-minutes: 12
+        run: |
+          mkdir -p ~/blender
+          for url in https://mirrors.ocf.berkeley.edu/blender/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz \
+                     https://ftp.halifax.rwth-aachen.de/blender/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz \
+                     https://download.blender.org/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz; do
+            echo "Lade $url"
+            if curl -fL --retry 2 --connect-timeout 20 --max-time 420 -o /tmp/b.tar.xz "$url"; then break; fi
+          done
+          tar -xJf /tmp/b.tar.xz -C ~/blender --strip-components=1
+      - name: Blender prüfen
+        timeout-minutes: 2
+        run: |
+          echo "$HOME/blender" >> $GITHUB_PATH
+          ~/blender/blender -b --factory-startup -noaudio --version | head -3
+      - name: Python-Pakete
+        run: pip install -q -r requirements.txt
 
       - name: Part erstellen und hochladen
         env:
