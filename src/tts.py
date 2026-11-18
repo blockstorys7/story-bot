@@ -69,6 +69,18 @@ def synthesize_edge(cfg: dict, text: str, dest: Path) -> list:
         return marks
 
     marks = retry(lambda: asyncio.run(run()))
+    if not marks:  # manche Stimmen liefern keine Wortzeiten -> gleichmäßig schätzen
+        import subprocess
+        dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0",
+                                    str(dest)], capture_output=True, text=True).stdout.strip())
+        toks, pos, total = [], 0, len(text.replace(" ", "")) or 1
+        t = 0.1
+        for w in text.split(" "):
+            d = (dur - 0.3) * len(w) / total
+            toks.append({"word": w, "start": t, "end": t + d * 0.92, "char": text.find(w, pos)})
+            pos = toks[-1]["char"] + len(w)
+            t += d
+        return toks
     words, pos = [], 0
     for start, end, w in marks:  # Wörter wieder ihrer Position im Text zuordnen
         idx = text.find(w, pos)

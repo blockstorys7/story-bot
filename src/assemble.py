@@ -40,8 +40,8 @@ def render_segment(cfg, src: Path, dur: float, idx: int, dest: Path):
            "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", 20, "-pix_fmt", "yuv420p", dest)
     else:
         frames = int(dur * fps) + 1
-        step = 0.12 / frames
-        z = f"min(1+{step}*on,1.12)" if idx % 2 == 0 else f"max(1.12-{step}*on,1.0)"
+        step = 0.07 / frames
+        z = f"min(1+{step}*on,1.07)" if idx % 2 == 0 else f"max(1.07-{step}*on,1.0)"
         vf = (f"scale={W*2}:{H*2}:force_original_aspect_ratio=increase,crop={W*2}:{H*2},"
               f"zoompan=z='{z}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s={W}x{H}:fps={fps},setsar=1")
         ff("-loop", 1, "-i", src, "-t", f"{dur:.3f}", "-vf", vf,
@@ -64,7 +64,7 @@ WrapStyle: 2
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Word,{r['font']},{r['font_size']},&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,1,0,0,0,100,100,0,0,1,7,3,5,40,40,0,1
+Style: Word,{r['font']},{r['font_size']},&H{r.get('caption_color', '0021E1FF')},&H00FFFFFF,&H00000000,&H64000000,1,0,0,0,100,100,0,0,1,6,2,5,40,40,0,1
 Style: Part,{r['font']},{int(r['font_size']*0.8)},&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,1,0,0,0,100,100,2,0,3,18,0,8,40,40,170,1
 
 [Events]
@@ -92,7 +92,7 @@ def assemble(cfg, segments: list, voice: Path, words: list, part: int, total: in
     """segments = [(quelle_bild_oder_clip, dauer), ...]"""
     seg_files = []
     for i, (src, dur) in enumerate(segments):
-        if Path(src).name.startswith("scene_"):  # schon fertig gerendert (compose.py)
+        if Path(src).suffix == ".mp4" and Path(src).name.startswith("scene_"):  # schon fertig gerendert
             seg_files.append(Path(src))
             continue
         p = work / f"seg_{i:02d}.mp4"

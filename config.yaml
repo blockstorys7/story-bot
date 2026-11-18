@@ -7,13 +7,7 @@ target_seconds: 78      # Ziel-Sprechlänge (Reels-API erlaubt max. 90 s)
 min_seconds: 62         # Video wird NIE kürzer (TikTok Creator Rewards zählt nur Videos > 1 min)
 parts_per_series: 8     # Teile pro Story (8 = bei 4 Videos/Tag genau 2 Tage)
 end_text: "TEIL {n} FOLGT…"   # Endkarte, falls die Erzählung kürzer als min_seconds ist
-end_text_final: "ENDE"     # Wie viele Parts eine Story hat, bevor eine neue beginnt
-
-# Stil der KI-Hintergründe (Figuren zeichnet der Code selbst -> immer gleich)
-background_style: >
-  3D video game environment render, low-poly blocky game world, simple clean
-  textures, soft global illumination, cinematic camera angle, eye level,
-  vertical 9:16 composition, no text, no logos, no watermark
+end_text_final: "ENDE"
 
 # --- KI-Modelle -------------------------------------------------
 # Voreinstellung = 0-€-MODUS. Wenn Geld reinkommt, unten auf die
@@ -25,20 +19,10 @@ llm:
     - gemini:gemini-flash-lite-latest
     - pollinations:openai
     - pollinations:mistral
-image:
-  provider: pollinations            # gratis | Upgrade: fal
-  free_model: flux
-  model: fal-ai/nano-banana         # nur bei provider: fal
-  edit_model: fal-ai/nano-banana/edit
-video:
-  enabled: false                    # gratis = Code-Animation | Upgrade: true (Kling animiert die fertigen Szenen)
-  model: fal-ai/kling-video/v2.5-turbo/pro/image-to-video
-  max_clips_per_part: 6             # nur die wichtigsten Szenen werden animiert
-  clip_seconds: "5"
 tts:
   provider: edge                    # gratis (Microsoft-Edge-Stimmen) | Upgrade: elevenlabs
-  edge_voice: de-DE-ConradNeural    # englisch z.B. en-US-AndrewNeural, en-US-GuyNeural
-  edge_rate: "+8%"
+  edge_voice: de-DE-FlorianMultilingualNeural   # männlich, natürlich klingend
+  edge_rate: "+12%"
   voice_id: "pNInz6obpgDQGcFmaJgB"  # beliebige ElevenLabs-Stimme
   model: eleven_multilingual_v2
   speed: 1.08
@@ -49,7 +33,11 @@ render:
   height: 1920
   fps: 30
   font: "Montserrat"
-  font_size: 92
+  font_size: 80
+  caption_color: "0021E1FF"         # ASS-Farbe (AABBGGRR): gelb wie im Vorbild
+  render_width: 720                 # 3D-Renderauflösung (wird auf 1080x1920 hochskaliert)
+  render_height: 1280
+  samples: 32                       # Render-Qualität (mehr = schöner, aber langsamer)
   music: assets/music.mp3           # optional (z.B. YouTube Audio Library, gratis), leise im Hintergrund (lizenzfreie Musik!)
   music_volume: 0.12
 

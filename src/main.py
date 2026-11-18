@@ -47,10 +47,42 @@ def ensure_series(cfg, st) -> str:
     return slug
 
 
+def render_3d(cfg, bible, scenes, work: Path) -> list:
+    """Baut die Einstellungen in Blender und gibt die Bildpfade zurück."""
+    import subprocess
+
+    from faces import face_textures
+    specs = {c["id"]: c["spec"] for c in bible["characters"]}
+    shots = []
+    for i, sc in enumerate(scenes):
+        sh = {k: sc.get(k) for k in ("set", "sign_text", "room_type", "shot", "focus")}
+        sh["characters"] = [c for c in (sc.get("characters") or []) if c.get("id") in specs]
+        sh["seed"] = i
+        if not sh["characters"] and sh.get("shot") != "establishing":
+            sh["shot"] = "establishing"
+        shots.append(sh)
+    need = {(c["id"], c.get("expression") or "neutral") for s in shots for c in s["characters"]}
+    need |= {(k, "neutral") for k in specs}
+    faces = face_textures(specs, need, work / "faces")
+    r = cfg["render"]
+    data = {"render": {"width": r.get("render_width", 720), "height": r.get("render_height", 1280),
+                       "samples": r.get("samples", 32)},
+            "characters": specs, "faces": faces, "font": str((ROOT / "assets/fonts/Montserrat.ttf").resolve()),
+            "shots": shots}
+    write_json(work / "shots.json", data)
+    out = work / "img"
+    subprocess.run([cfg["render"].get("blender", "blender"), "-b", "-noaudio", "-P",
+                    str(ROOT / "src/blender/render_shots.py"), "--", str(work / "shots.json"), str(out)],
+                   check=True, stdout=subprocess.DEVNULL if not cfg["render"].get("verbose") else None)
+    imgs = [out / f"shot_{i:02d}.png" for i in range(len(shots))]
+    missing = [str(p) for p in imgs if not p.exists()]
+    if missing:
+        raise RuntimeError(f"Blender hat {len(missing)} Bilder nicht erzeugt")
+    return imgs
+
+
 def generate(cfg) -> dict:
     from assemble import assemble, probe_duration, scene_timings
-    from compose import render_scene
-    from media_gen import scene_background, scene_clip
     from script_gen import generate_script
     from tts import synthesize
 
@@ -62,59 +94,45 @@ def generate(cfg) -> dict:
     total = cfg["parts_per_series"]
     work = OUT / slug / f"part_{part:02d}"
     work.mkdir(parents=True, exist_ok=True)
-    print(f"== {bible['title']} – Part {part}/{total} ==")
-    specs = {c["id"]: c["spec"] for c in bible["characters"]}
+    print(f"== {bible['title']} – Teil {part}/{total} ==", flush=True)
 
     script = read_json(work / "script.json")
     if not script:
-        print("Drehbuch …")
+        print("Drehbuch …", flush=True)
         script = generate_script(cfg, bible, [p["summary"] for p in ser["parts"]], part)
         # Zu kurzes Drehbuch? Einmal neu schreiben lassen (~2,6 gesprochene Wörter pro Sekunde)
         n_words = len(" ".join(s["narration"] for s in script["scenes"]).split())
         if n_words < cfg["min_seconds"] * 2.4:
-            print(f"  Drehbuch zu kurz ({n_words} Wörter) – wird verlängert …")
-            longer = dict(cfg, target_seconds=cfg["target_seconds"] + 12)
+            print(f"  Drehbuch zu kurz ({n_words} Wörter) – wird verlängert …", flush=True)
+            longer = dict(cfg, target_seconds=cfg["target_seconds"] + 15)
             retry_script = generate_script(longer, bible, [p["summary"] for p in ser["parts"]], part)
             if len(" ".join(s["narration"] for s in retry_script["scenes"]).split()) > n_words:
                 script = retry_script
         write_json(work / "script.json", script)
-    scenes = script["scenes"]
+    scenes = [s for s in script["scenes"] if s.get("narration", "").strip()]
+    print(f"  {len(scenes)} Szenen", flush=True)
 
-    print(f"Hintergründe ({len(scenes)} Szenen) …")
-    bgs = [scene_background(cfg, bible, sc, work / f"bg_{i:02d}.png") for i, sc in enumerate(scenes)]
-
-    print("Stimme …")
+    print("Stimme …", flush=True)
     voice = work / "voice.mp3"
     words = read_json(work / "words.json")
     if not words or not voice.exists():
-        words = synthesize(cfg, " ".join(s["narration"] for s in scenes), voice)
+        words = synthesize(cfg, " ".join(s["narration"].strip() for s in scenes), voice)
         write_json(work / "words.json", words)
-    times = scene_timings([s["narration"] for s in scenes], words, probe_duration(voice))
-    # Mindestlänge garantieren: letzte Szene verlängern, dazu Endkarte "Teil X folgt"
-    missing = cfg["min_seconds"] - times[-1][1]
-    if missing > 0:
-        print(f"  +{missing:.1f}s Endkarte für Mindestlänge")
+    narr = [s["narration"].strip() for s in scenes]
+    times = scene_timings(narr, words, probe_duration(voice))
+    speech_end = times[-1][1]
+    missing = cfg["min_seconds"] - speech_end
+    if missing > 0:  # Mindestlänge garantieren: Endkarte
+        print(f"  +{missing:.1f}s Endkarte für Mindestlänge", flush=True)
         times[-1] = (times[-1][0], times[-1][1] + missing)
 
-    print("Szenen animieren …")
-    animate = set()
-    if cfg["video"]["enabled"]:
-        animate = {i for i, sc in enumerate(scenes) if sc.get("animate")}
-        animate = set(sorted(animate)[: cfg["video"]["max_clips_per_part"]])
-    segments = []
-    for i, (sc, (s, e)) in enumerate(zip(scenes, times)):
-        if i in animate:
-            still = render_scene(cfg, specs, sc, bgs[i], s, e - s, words, i, None, still=work / f"still_{i:02d}.png")
-            segments.append((scene_clip(cfg, still, sc, work / f"clip_{i:02d}.mp4"), e - s))
-        else:
-            dest = work / f"scene_{i:02d}.mp4"
-            render_scene(cfg, specs, sc, bgs[i], s, e - s, words, i, dest)
-            segments.append((dest, e - s))
+    print("3D-Szenen rendern …", flush=True)
+    imgs = render_3d(cfg, bible, scenes, work)
 
-    print("Schnitt …")
-    end_from = scene_timings([s["narration"] for s in scenes], words, probe_duration(voice))[-1][1] - 0.5
+    print("Schnitt …", flush=True)
+    segments = [(imgs[i], e - s) for i, (s, e) in enumerate(times)]
     final = assemble(cfg, segments, voice, words, part, total, work, work / "final.mp4", ROOT,
-                     end_card=(end_from, times[-1][1]))
+                     end_card=(speech_end - 0.5, times[-1][1]))
 
     tags = " ".join("#" + t.lstrip("#").replace(" ", "") for t in script.get("hashtags", []))
     entry = {"part": part, "dir": str(work.relative_to(ROOT)), "summary": script["summary"],
@@ -122,7 +140,7 @@ def generate(cfg) -> dict:
              "published": {}, "attempts": 0}
     ser["parts"].append(entry)
     write_json(STATE, st)
-    print(f"Fertig: {final}")
+    print(f"Fertig: {final}", flush=True)
     return entry
 
 

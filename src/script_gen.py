@@ -82,42 +82,42 @@ def llm(cfg: dict, prompt: str) -> dict:
     raise RuntimeError(f"Kein Sprachmodell erreichbar: {last}")
 
 
-PROMPT = """Du schreibst virale Kurzvideo-Serien (TikTok/Reels): animierte Geschichten mit blockigen 3D-Spielfiguren und Erzählerstimme.
+PROMPT = """Du schreibst virale deutsche TikTok-Serien im Stil von Roblox-Storys: eine Erzählerstimme erzählt eine witzige, absurde Geschichte, dazu sehr schnelle Schnitte (alle 1–2 Sekunden ein neues Bild).
 
 SERIE:
 {bible}
 
-BISHERIGE PARTS (Zusammenfassungen):
+BISHERIGE TEILE (Zusammenfassungen):
 {history}
 
-AUFGABE: Schreibe Part {part} von {total}.
-- Sprache der Erzählung: {language}
-- Gesprochene Länge ca. {seconds} Sekunden (~{words} Wörter insgesamt) – NICHT kürzer.
-- Erster Satz = starker Hook, der auch ohne Vorwissen funktioniert{recap}.
-- Viele kurze Szenen (je 1 Satz, 2–4 Sekunden), wie schnelle Schnitte.
+AUFGABE: Schreibe Teil {part} von {total}.
+- Sprache: {language}. Natürlich, umgangssprachlich, wie ein junger Erzähler, der einem Freund etwas erzählt.
+- Gesprochene Länge ca. {seconds} Sekunden = ca. {words} Wörter insgesamt. NICHT kürzer.
+- Erster Satz = starker Hook{recap}.
 - {ending}
-- Keine echten Marken, Personen oder geschützten Figuren nennen.
+- 35 bis 45 Szenen. Jede Szene = ein kurzer Satzteil mit 4–10 Wörtern (ein Schnitt).
+- Keine echten Marken, Personen oder geschützten Figuren.
 
 Pro Szene:
-- "background": ENGLISCHE Beschreibung NUR der Umgebung/Objekte, OHNE Personen (z.B. "close-up of a security camera on a dark wall", "long arched maintenance tunnel with warm lamps").
-- "location": Index des Ortes aus "locations" der Serie (gleicher Ort = gleicher Look), oder null für Nahaufnahmen von Objekten.
-- "shot": "wide" | "medium" | "close"
-- "characters": 0–3 Figuren aus der Serie: {{"id", "pose", "expression", "position", "move"}}
-    pose: idle | wave | point | shrug | arms_up | carry | think | hands_hips | sneak
-    expression: smile | grin | wink | shocked | angry | sad | smirk | neutral
-    position: left | center | right
-    move: none | walk_in_left | walk_in_right | walk_out_left | walk_out_right | run_across
-- "speaker": id der Figur, die gerade erzählt/spricht (Mund bewegt sich), sonst null.
-Mische Nahaufnahmen von Figuren, Totalen und Objekt-Szenen ohne Figuren für Abwechslung.
+- "narration": der gesprochene Text dieser Szene
+- "set": street | facade | room | jail | meadow | sign
+- "sign_text": Text auf dem Schild/Gebäude, GROSSBUCHSTABEN, max. 3 Wörter (bei facade Pflicht, z.B. "RATHAUS", "GEFÄNGNIS"; bei sign die Pointe, z.B. "+2 JAHRE"), sonst null
+- "room_type": nur bei set=room: bakery | office | police | school | home | shop
+- "shot": close (Gesicht groß, für Reaktionen – oft verwenden!) | medium | wide | establishing (nur Ort, ohne Figuren)
+- "focus": id der wichtigsten Figur im Bild
+- "characters": 0–3 Figuren: {{"id", "pose", "expression", "prop", "sign_text"}}
+    pose: idle | wave | point | arms_up | shrug | hold_sign | think | carry | hands_hips | walk | run | sneak | victory | facepalm
+    expression: neutral | happy | smile | shocked | angry | sad | smirk | worried | wink | laugh
+    prop: null | sign | bread | box   (bei hold_sign: "sign_text" = Text auf dem Schild, z.B. "NEUE REGEL: KEIN HÜPFEN")
+Wechsle oft zwischen Nahaufnahmen (close) der Gesichter, Orten und Pointen-Schildern – wie ein schneller TikTok-Schnitt.
 
-Antworte NUR mit JSON in genau diesem Format:
+Antworte NUR mit JSON:
 {{
-  "scenes": [{{"narration": "...", "background": "...", "location": 0, "shot": "wide",
-              "characters": [{{"id": "...", "pose": "idle", "expression": "smile", "position": "center", "move": "none"}}],
-              "speaker": null, "animate": false}}],
+  "scenes": [{{"narration": "...", "set": "street", "sign_text": null, "room_type": null, "shot": "close", "focus": "...",
+              "characters": [{{"id": "...", "pose": "idle", "expression": "happy", "prop": null}}]}}],
   "caption": "kurzer Post-Text mit Teil-Nummer, ohne Hashtags",
   "hashtags": ["...", "..."],
-  "summary": "2-3 Sätze: was in diesem Part passiert ist (für Kontinuität)"
+  "summary": "2-3 Sätze: was in diesem Teil passiert ist (für Kontinuität)"
 }}"""
 
 
@@ -144,23 +144,20 @@ def generate_script(cfg: dict, bible: dict, history: list, part: int) -> dict:
     return script
 
 
-NEW_SERIES_PROMPT = """Erfinde eine neue fesselnde Kurzvideo-Serie ({total} Parts) mit blockigen 3D-Spielfiguren (Heist, Mystery, Abenteuer, Rache, Flucht …). Keine echten Marken oder geschützten Figuren.
+NEW_SERIES_PROMPT = """Erfinde eine neue fesselnde deutsche TikTok-Serie ({total} Teile) im Stil von Roblox-Storys in einer bunten Blockstadt (z.B. absurde Stadtregeln, Gefängnisausbruch, Schulchaos, Detektivfall, Rache am Nachbarn). Keine echten Marken oder geschützten Figuren.
 Bisherige Serien (nicht wiederholen): {previous}
 
-Figuren werden per Code gezeichnet; beschreibe sie NUR mit diesen Feldern:
-skin/hair_color/beard_color/hat_color/jacket/shirt/pants/shoes/tie: Hex-Farben wie "#2f3f6b" (tie optional)
-hair: none | short | long | spiky | bun
-beard: none | short | full | mustache
-hat: none | flatcap | police | tophat | beanie | cap
-outfit: suit | jacket | uniform | hoodie | tshirt
-accessory: none | sunglasses | eyemask | glasses
-neck: none | chain | pearls
-Gib Figuren klar unterscheidbare Farben und Hüte.
+Figuren (4–6) werden in 3D per Code gebaut; beschreibe sie NUR mit diesen Feldern:
+skin, eye_color, hair_color, hat_color, top, shirt, trim, pants, shoes, tie: Hex-Farben wie "#2f3f6b" (trim/tie optional)
+hair: none | short | spiky | messy | long | bun
+hat: none | police | tophat | beanie | cap | flatcap
+outfit: suit | jacket | uniform | hoodie | tshirt | dress
+Gib jeder Figur klar unterscheidbare Haare/Farben. Die Hauptfigur sollte auffällige Haare haben.
 
 Antworte NUR mit JSON:
 {{"title": "...", "premise": "...", "tone": "...",
-  "characters": [{{"id": "kurz_ohne_leerzeichen", "name": "...", "spec": {{"skin": "#...", "hair": "short", "hair_color": "#...", "beard": "none", "hat": "none", "hat_color": "#...", "outfit": "suit", "jacket": "#...", "shirt": "#...", "pants": "#...", "shoes": "#1b1b1b", "accessory": "none", "neck": "none"}}}}],
-  "locations": ["englische Beschreibung eines Ortes", "..."]}}"""
+  "characters": [{{"id": "kurz_ohne_leerzeichen", "name": "...", "spec": {{"skin": "#...", "eye_color": "#...", "hair": "spiky", "hair_color": "#...", "hat": "none", "outfit": "suit", "top": "#...", "shirt": "#...", "trim": "#...", "pants": "#...", "shoes": "#..."}}}}],
+  "sets": "street, facade, room, jail, meadow, sign"}}"""
 
 
 def generate_series_bible(cfg: dict, previous_titles: list) -> dict:
