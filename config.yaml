@@ -20,8 +20,8 @@ llm:
   model: gemini-flash-latest        # bei anthropic: claude-sonnet-5-5
   fallbacks:                        # werden der Reihe nach probiert, falls das Hauptmodell überlastet ist
     - gemini:gemini-flash-lite-latest
-    - gemini:gemini-2.5-flash
     - pollinations:openai
+    - pollinations:mistral
 image:
   provider: pollinations            # gratis | Upgrade: fal
   free_model: flux

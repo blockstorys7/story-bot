@@ -12,7 +12,7 @@ def _call(prov: str, model: str, prompt: str) -> str:
     if prov == "gemini":
         r = requests.post(
             f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-            params={"key": env("GEMINI_API_KEY")}, timeout=150,
+            params={"key": env("GEMINI_API_KEY")}, timeout=300,
             json={"contents": [{"parts": [{"text": prompt}]}],
                   "generationConfig": {"responseMimeType": "application/json", "temperature": 1.0}})
         r.raise_for_status()
@@ -22,7 +22,8 @@ def _call(prov: str, model: str, prompt: str) -> str:
         if os.environ.get("POLLINATIONS_KEY"):
             h["Authorization"] = f"Bearer {os.environ['POLLINATIONS_KEY']}"
         r = requests.post("https://text.pollinations.ai/openai", headers=h, timeout=300, json={
-            "model": model, "messages": [{"role": "user", "content": prompt}]})
+            "model": model, "response_format": {"type": "json_object"},
+            "messages": [{"role": "user", "content": prompt}]})
         r.raise_for_status()
         return r.json()["choices"][0]["message"]["content"]
     r = requests.post(
@@ -35,16 +36,46 @@ def _call(prov: str, model: str, prompt: str) -> str:
     return "".join(b.get("text", "") for b in r.json()["content"])
 
 
+def parse_json(text: str) -> dict:
+    """JSON aus der Antwort holen – kleine Formatfehler der KI werden automatisch repariert."""
+    text = re.sub(r"^```(?:json)?|```$", "", text.strip(), flags=re.M)
+    m = re.search(r"\{.*\}", text, re.S)
+    raw = m.group(0) if m else text
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        from json_repair import repair_json
+        obj = repair_json(raw, return_objects=True)
+        if not isinstance(obj, dict) or not obj:
+            raise
+        return obj
+
+
+def gemini_models() -> list:
+    """Fragt bei Google ab, welche Flash-Modelle es aktuell gibt (Namen ändern sich öfter)."""
+    try:
+        r = requests.get("https://generativelanguage.googleapis.com/v1beta/models",
+                         params={"key": env("GEMINI_API_KEY"), "pageSize": 200}, timeout=30)
+        names = [m["name"].split("/", 1)[1] for m in r.json().get("models", [])
+                 if "generateContent" in m.get("supportedGenerationMethods", [])]
+        flash = [n for n in names if "flash" in n and not any(x in n for x in ("image", "tts", "audio", "live", "exp"))]
+        return sorted(flash, reverse=True)[:4]
+    except Exception:  # noqa: BLE001
+        return []
+
+
 def llm(cfg: dict, prompt: str) -> dict:
     """Probiert das Hauptmodell und dann die Ausweichmodelle (z.B. wenn Gemini überlastet ist)."""
     chain = [(cfg["llm"].get("provider", "gemini"), cfg["llm"]["model"])]
-    chain += [tuple(x.split(":", 1)) for x in cfg["llm"].get("fallbacks", [])]
+    fb = [tuple(x.split(":", 1)) for x in cfg["llm"].get("fallbacks", [])]
+    if any(p == "gemini" for p, _ in chain + fb) and os.environ.get("GEMINI_API_KEY"):
+        chain += [("gemini", m) for m in gemini_models() if ("gemini", m) not in chain + fb]
+    chain += fb
     last = None
     for prov, model in chain:
         print(f"  Sprachmodell: {prov}/{model}")
         try:
-            return retry(lambda: json.loads(re.search(r"\{.*\}", _call(prov, model, prompt), re.S).group(0)),
-                         tries=2, wait=15)
+            return retry(lambda: parse_json(_call(prov, model, prompt)), tries=2, wait=20)
         except Exception as e:  # noqa: BLE001
             last = e
             print(f"  ! {prov}/{model} nicht verfügbar – nächstes Modell")
