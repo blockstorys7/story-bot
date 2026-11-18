@@ -3,7 +3,13 @@ name: Story Bot
 on:
   schedule:
     - cron: "7 17 * * *"   # täglich 18:07 Uhr deutscher Winterzeit (UTC-Zeit +1)
-  workflow_dispatch: {}    # "Run workflow"-Knopf zum sofortigen Starten
+  workflow_dispatch:       # "Run workflow"-Knopf zum sofortigen Starten
+    inputs:
+      modus:
+        description: "run = erstellen + hochladen, generate = nur Testvideo erstellen"
+        type: choice
+        options: [run, generate]
+        default: run
 
 permissions:
   contents: write          # um den Serien-Fortschritt zu speichern
@@ -43,10 +49,10 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           TOKENS_JSON: ${{ secrets.TOKENS_JSON }}
           GH_TOKEN: ${{ secrets.GH_PAT }}
-        run: python src/main.py run
+        run: python src/main.py ${{ inputs.modus || 'run' }}
 
       - name: Fortschritt speichern
-        if: always()
+        if: always() && (inputs.modus || 'run') == 'run'
         run: |
           git config user.name "story-bot"
           git config user.email "story-bot@users.noreply.github.com"
