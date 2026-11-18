@@ -37,7 +37,7 @@ render:
   caption_color: "0021E1FF"         # ASS-Farbe (AABBGGRR): gelb wie im Vorbild
   render_width: 720                 # 3D-Renderauflösung (wird auf 1080x1920 hochskaliert)
   render_height: 1280
-  samples: 32                       # Render-Qualität (mehr = schöner, aber langsamer)
+  samples: 20                       # Render-Qualität (mehr = schöner, aber langsamer)
   music: assets/music.mp3           # optional (z.B. YouTube Audio Library, gratis), leise im Hintergrund (lizenzfreie Musik!)
   music_volume: 0.12
 

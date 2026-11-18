@@ -67,7 +67,7 @@ def render_3d(cfg, bible, scenes, work: Path) -> list:
     r = cfg["render"]
     data = {"render": {"width": r.get("render_width", 720), "height": r.get("render_height", 1280),
                        "samples": r.get("samples", 32)},
-            "characters": specs, "faces": faces, "font": str((ROOT / "assets/fonts/Montserrat.ttf").resolve()),
+            "characters": specs, "faces": faces, "font": str((ROOT / "assets/fonts/Poppins-Bold.ttf").resolve()),
             "shots": shots}
     write_json(work / "shots.json", data)
     out = work / "img"

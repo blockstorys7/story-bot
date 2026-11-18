@@ -63,7 +63,13 @@ def brick_mat(c1="#b5523b", c2="#a3462f", mortar="#d9cbb8", scale=3.0):
     br.inputs["Mortar"].default_value = lin(mortar)
     br.inputs["Scale"].default_value = scale
     br.inputs["Mortar Size"].default_value = 0.025
-    nt.links.new(tc.outputs["Object"], br.inputs["Vector"])
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    comb = nt.nodes.new("ShaderNodeCombineXYZ")
+    nt.links.new(tc.outputs["Object"], sep.inputs[0])
+    nt.links.new(sep.outputs["X"], comb.inputs["X"])
+    nt.links.new(sep.outputs["Z"], comb.inputs["Y"])
+    nt.links.new(sep.outputs["Y"], comb.inputs["Z"])
+    nt.links.new(comb.outputs[0], br.inputs["Vector"])
     nt.links.new(br.outputs["Color"], b.inputs["Base Color"])
     b.inputs["Roughness"].default_value = 0.8
     MATS[k] = m
@@ -225,13 +231,19 @@ def hair(spec, head, rng):
         return
     hm = mat(spec.get("hair_color", "#3a2a20"), 0.45)
     top = 1.25 / 2
+    has_hat = spec.get("hat", "none") not in ("none", None)
+    if has_hat and style in ("spiky", "messy"):
+        style = "short"
     # Grundkappe + Hinterkopf
-    box((1.42, 1.32, 0.42), (0, 0.03, top + 0.12), hm, head, bevel=0.17, name="hair")
+    if not has_hat:
+        box((1.42, 1.32, 0.42), (0, 0.03, top + 0.12), hm, head, bevel=0.17, name="hair")
     box((1.42, 0.5, 1.0), (0, 0.45, top - 0.3), hm, head, bevel=0.15, name="hair")
     for sx in (-1, 1):  # Seiten
         box((0.16, 1.0, 0.75 if style != "long" else 1.6), (sx * 0.7, 0.1, top - 0.25 - (0.4 if style == "long" else 0)),
             hm, head, bevel=0.06, name="hair")
     n_front = {"spiky": 7, "messy": 8, "short": 5, "long": 6, "bun": 5}.get(style, 5)
+    if has_hat:
+        n_front = 0
     for i in range(n_front):  # Pony / Fransen vorne, nach unten zeigend
         x = -0.6 + 1.2 * (i + 0.5) / n_front + rng.uniform(-0.04, 0.04)
         ln = rng.uniform(0.38, 0.62) if style in ("spiky", "messy") else rng.uniform(0.25, 0.4)
@@ -360,9 +372,9 @@ def character(cid, spec, cfg, faces):
         else:
             text(lines[0].strip(), (0, -0.08, 0), 0.5, "#1a1a1a", board, max_w=3.3)
     elif prop == "bread":
-        sphere(0.45, (-1.5, -1.3, 2.7), mat("#c98a3c", 0.5), root, scale=(1.4, 0.8, 0.7))
+        sphere(0.5, (0, -1.9, 3.3), mat("#c98a3c", 0.5), root, scale=(1.6, 0.8, 0.7))
     elif prop == "box":
-        box((1.6, 1.0, 1.0), (0, -1.4, 2.6), mat("#b08350", 0.7), root, bevel=0.03)
+        box((1.8, 1.2, 1.2), (0, -2.0, 3.2), mat("#b08350", 0.7), root, bevel=0.03)
     return root
 
 
@@ -384,13 +396,13 @@ def world(kind="sky"):
         except Exception:
             pass
         nt.links.new(sky.outputs["Color"], bg.inputs["Color"])
-        bg.inputs["Strength"].default_value = 0.32
+        bg.inputs["Strength"].default_value = 0.2
     else:
         bg.inputs["Color"].default_value = lin("#fff4e6")
-        bg.inputs["Strength"].default_value = 0.6
+        bg.inputs["Strength"].default_value = 0.35
 
 
-def sun(strength=3.2, rot=(50, 12, 35)):
+def sun(strength=2.6, rot=(50, 12, 35)):
     ld = bpy.data.lights.new("sun", "SUN")
     ld.energy = strength
     ld.angle = math.radians(6)
@@ -438,7 +450,7 @@ def lamp(loc):
 
 
 SHOP_NAMES = ["BÄCKER", "CAFÉ", "SHOP", "MARKT", "FRISEUR", "KIOSK", "POST", "BANK", "PIZZA", "APOTHEKE"]
-FACADE_COLORS = ["#e8473c", "#f2b33d", "#3f8fd2", "#48b36b", "#9b59b6", "#f07c2a", "#2bb3b3", "#e85d8f", "#f4e3b5"]
+FACADE_COLORS = ["#d8322a", "#f2a516", "#1f6fc4", "#2f9e52", "#7d3fb0", "#ea6a10", "#139b9b", "#d93a78", "#f2d27a", "#203a8c"]
 
 
 def building(x0, y0, w, d, h, color, facing, rng, sign=None, door=True):
@@ -458,8 +470,9 @@ def building(x0, y0, w, d, h, color, facing, rng, sign=None, door=True):
         if door:
             box((1.8, 0.14, 2.9), (x0, fy, 1.45), mat("#3a6fb0", 0.4, key="door"), bevel=0.03)
         if sign:
-            box((min(w - 0.6, 1.2 + 0.75 * len(sign)), 0.25, 1.3), (x0, fy - 0.1, 4.0), mat("#1d3557", 0.5, key="signbg"), bevel=0.05)
-            text(sign, (x0, fy - 0.26, 4.0), 0.85, "#ffffff", max_w=w - 1.2)
+            sz = h - 1.6 if h >= 10 else 4.2
+            box((min(w - 0.6, 1.6 + 1.05 * len(sign)), 0.3, 2.0), (x0, fy - 0.12, sz), mat("#1d4fa0", 0.5, key="signbg"), bevel=0.06)
+            text(sign, (x0, fy - 0.3, sz), 1.35, "#ffffff", max_w=w - 1.6, extrude=0.06)
     else:
         sx = 1 if facing == "+x" else -1
         fx = x0 + sx * (w / 2 + 0.06)
@@ -479,8 +492,8 @@ def building(x0, y0, w, d, h, color, facing, rng, sign=None, door=True):
 
 def set_street(shot, rng):
     world("sky")
-    sun(3.4, (52, 10, 30))
-    box((16, 260, 0.2), (0, 90, -0.1), mat("#5d6168", 0.85, key="asphalt"), bevel=0)
+    sun(2.7, (52, 10, 30))
+    box((16, 260, 0.2), (0, 90, -0.1), mat("#4a4d55", 0.85, key="asphalt"), bevel=0)
     for y in range(-20, 200, 8):
         box((0.3, 3.5, 0.02), (0, y, 0.01), mat("#f2f2f2", 0.6, key="lane"), bevel=0)
     for k in range(7):  # Zebrastreifen
@@ -507,8 +520,8 @@ def set_street(shot, rng):
 
 def set_facade(shot, rng):
     world("sky")
-    sun(3.4, (50, 8, 25))
-    box((80, 80, 0.2), (0, 0, -0.1), mat("#5d6168", 0.85, key="asphalt"), bevel=0)
+    sun(2.7, (50, 8, 25))
+    box((80, 80, 0.2), (0, 0, -0.1), mat("#4a4d55", 0.85, key="asphalt"), bevel=0)
     box((80, 5, 0.35), (0, 6.5, 0.17), mat("#b9b6ad", 0.8, key="sidewalk"), bevel=0.02)
     col = shot.get("color") or rng.choice(FACADE_COLORS)
     sign = shot.get("sign_text") or "RATHAUS"
@@ -541,8 +554,8 @@ def set_room(shot, rng):
         box((0.3, 16, 9), (sx * 8, 2, 4.5), wall, bevel=0)
     box((16, 16, 0.2), (0, 2, 9), mat("#fbf8f2", 0.9, key="ceil"), bevel=0)
     box((16, 0.35, 0.5), (0, 6.3, 0.25), mat("#ffffff", 0.6, key="skirt"), bevel=0.02)
-    area((0, -2, 8.7), 1400, 9, (0, 0, 0))
-    area((0, -9, 5), 700, 8, (75, 0, 0))
+    area((0, -2, 8.7), 900, 9, (0, 0, 0))
+    area((0, -9, 5), 450, 8, (75, 0, 0))
     sign = shot.get("sign_text")
     if rt == "bakery":
         box((12, 1.6, 2.2), (0, 2.6, 1.1), mat("#f6f2ea", 0.5, key="counter"), bevel=0.05)
@@ -573,8 +586,8 @@ def set_jail(shot, rng):
     for sx in (-1, 1):
         box((0.3, 16, 9), (sx * 8, 2, 4.5), br, bevel=0)
     box((16, 16, 0.2), (0, 2, 9), mat("#e9e6df", 0.9, key="ceil2"), bevel=0)
-    area((0, 1, 8.7), 1100, 7, (0, 0, 0))
-    area((0, -9, 5), 600, 8, (75, 0, 0))
+    area((0, 1, 8.7), 750, 7, (0, 0, 0))
+    area((0, -9, 5), 400, 8, (75, 0, 0))
     box((5, 1.6, 0.6), (-4.5, 5.2, 1.2), mat("#d7d2c6", 0.8), bevel=0.05)  # Pritsche
     bars = mat("#1c1d21", 0.35, 0.6, key="bars")
     x = -7.6
@@ -593,7 +606,7 @@ def set_jail(shot, rng):
 
 def set_meadow(shot, rng):
     world("sky")
-    sun(3.3, (48, 6, 40))
+    sun(2.7, (48, 6, 40))
     box((400, 400, 0.2), (0, 100, -0.1), mat("#6cbf4a", 0.95, key="grass"), bevel=0)
     hills(120, "#5c9a48")
     for _ in range(14):
@@ -610,7 +623,7 @@ def set_sign(shot, rng):
     world("indoor")
     box((20, 0.3, 14), (0, 4, 5), brick_mat(scale=2.4), bevel=0)
     box((20, 12, 0.2), (0, 0, -0.1), mat("#bdbab3", 0.85, key="concrete"), bevel=0)
-    area((0, -6, 9), 1500, 9, (40, 0, 0))
+    area((0, -6, 9), 900, 9, (40, 0, 0))
     box((7.5, 0.25, 3.6), (0, 3.75, 5.6), mat("#1e2421", 0.85, key="chalkboard"), bevel=0.06)
     box((7.9, 0.2, 4.0), (0, 3.8, 5.6), stripe_mat("#8a5a30", "#6e4422", 3, key="frame"), bevel=0.04)
     text(shot.get("sign_text") or "!!!", (0, 3.55, 5.6), 1.4, "#ffffff", max_w=6.8)
@@ -639,23 +652,25 @@ def camera(shot, chars_cfg):
     elif kind == "close":
         hx_ = focus["x"]
         hz = 4.66 + (0.0 if focus.get("pose") != "hold_sign" else 0.0)
-        pos, tgt, lens = (hx_ + side * 0.6, -3.4 + focus.get("y", 0), hz + 0.12), (hx_, focus.get("y", 0), hz - 0.08), 50
+        pos, tgt, lens = (hx_ + side * 0.8, -4.9 + focus.get("y", 0), hz + 0.25), (hx_, focus.get("y", 0), hz - 0.35), 45
         cd.dof.use_dof = True
-        cd.dof.focus_distance = 3.4
+        cd.dof.focus_distance = 4.9
         cd.dof.aperture_fstop = 2.2
     elif kind == "medium":
         cx = sum(c["x"] for c in chars_cfg) / len(chars_cfg) if len(chars_cfg) > 1 else focus["x"]
-        pos, tgt, lens = (cx + side * 1.2, -7.2, 4.1), (cx, 0, 3.9 if focus.get("pose") != "hold_sign" else 4.8), 35
+        signing = any(c.get("pose") == "hold_sign" for c in chars_cfg)
+        dist = 8.2 if len(chars_cfg) == 1 else 10.5
+        if signing:
+            dist += 3
+        pos, tgt, lens = (cx + side * 1.2, -dist, 4.3), (cx, 0, 4.0 if not signing else 5.3), 35
         cd.dof.use_dof = True
-        cd.dof.focus_distance = 7.2
+        cd.dof.focus_distance = dist
         cd.dof.aperture_fstop = 4.0
     else:  # wide
         cx = sum(c["x"] for c in chars_cfg) / len(chars_cfg)
         pos, tgt, lens = (cx + side * 2.5, -13, 3.4), (cx, 0, 2.8), 24
         if st in ("room", "jail", "sign"):  # Innenräume: Kamera bleibt im Raum
             pos, tgt, lens = (cx + side * 1.5, -5.8, 4.4), (cx, 2, 3.0), 16
-    if kind == "medium" and len(chars_cfg) > 1:
-        lens = 28
     cam.location = pos
     d = Vector(tgt) - Vector(pos)
     cam.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
@@ -696,15 +711,12 @@ def setup_render():
     sc.render.resolution_y = int(R.get("height", 1280))
     sc.render.resolution_percentage = 100
     sc.render.image_settings.file_format = "PNG"
+    sc.view_settings.view_transform = R.get("view", "Standard")
     try:
-        sc.view_settings.view_transform = "AgX"
-        sc.view_settings.look = "AgX - Medium High Contrast"
+        sc.view_settings.look = "None"
     except Exception:
-        try:
-            sc.view_settings.view_transform = "Filmic"
-            sc.view_settings.look = "Medium High Contrast"
-        except Exception:
-            pass
+        pass
+    sc.view_settings.exposure = float(R.get("exposure", -0.35))
     sc.render.threads_mode = "AUTO"
 
 
