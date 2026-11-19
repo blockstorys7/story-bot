@@ -5,6 +5,7 @@
   python src/main.py publish    # zuletzt erstellten Part hochladen
   python src/main.py status     # Stand der Serien
 """
+import json
 import re
 import sys
 from pathlib import Path
@@ -24,15 +25,26 @@ def slugify(s: str) -> str:
 
 def load_state() -> dict:
     st = read_json(STATE)
-    if st is None:  # erste Serie = erste JSON-Datei im series-Ordner
+    if st is None:  # Startserie aus config.yaml, sonst erste JSON-Datei im series-Ordner
+        start = load_config().get("start_series")
         first = sorted(p.stem for p in (ROOT / "series").glob("*.json") if p.name != "state.json")
-        st = {"active": first[0] if first else None, "series": {}}
+        st = {"active": start if start in first else (first[0] if first else None), "series": {}}
     return st
 
 
 def ensure_series(cfg, st) -> str:
     from script_gen import generate_series_bible
+    if cfg.get("format") == "drama":
+        from drama import DRAMA_SERIES_PROMPT
+        from script_gen import llm
+
+        def generate_series_bible(cfg, titles):  # noqa: F811
+            return llm(cfg, DRAMA_SERIES_PROMPT.format(total=cfg["parts_per_series"],
+                                                       previous=", ".join(titles) or "keine"))
     slug = st.get("active")
+    if slug and cfg.get("format") == "drama" and "gender" not in json.dumps(read_json(ROOT / "series" / f"{slug}.json", {})):
+        slug = cfg.get("start_series") if cfg.get("start_series") not in st["series"] else None
+        st["active"] = slug
     done = slug and len(st["series"].get(slug, {}).get("parts", [])) >= cfg["parts_per_series"]
     if not slug or done:
         titles = [read_json(ROOT / "series" / f"{s}.json", {}).get("title", s) for s in st["series"]]
@@ -82,6 +94,8 @@ def render_3d(cfg, bible, scenes, work: Path) -> list:
 
 
 def generate(cfg) -> dict:
+    if cfg.get("format") == "drama":
+        return generate_drama_part(cfg)
     from assemble import assemble, probe_duration, scene_timings
     from script_gen import generate_script
     from tts import synthesize
@@ -152,6 +166,29 @@ def generate(cfg) -> dict:
     ser["parts"].append(entry)
     write_json(STATE, st)
     print(f"Fertig: {final}", flush=True)
+    return entry
+
+
+def generate_drama_part(cfg) -> dict:
+    from drama import generate_drama
+    st = load_state()
+    slug = ensure_series(cfg, st)
+    bible = read_json(ROOT / "series" / f"{slug}.json")
+    ser = st["series"][slug]
+    part = len(ser["parts"]) + 1
+    total = cfg["parts_per_series"]
+    work = OUT / slug / f"part_{part:02d}"
+    work.mkdir(parents=True, exist_ok=True)
+    print(f"== {bible['title']} – Teil {part}/{total} ==", flush=True)
+    history = [f"Teil {i + 1}: {p['summary']}" for i, p in enumerate(ser["parts"])]
+    script = generate_drama(cfg, bible, slug, part, total, history, work)
+    tags = " ".join("#" + t.lstrip("#").replace(" ", "") for t in script.get("hashtags", []))
+    entry = {"part": part, "dir": str(work.relative_to(ROOT)), "summary": script.get("summary", ""),
+             "caption": f"{script.get('caption', bible['title'] + ' – Teil ' + str(part))}\n\n{tags} "
+                        f"{cfg['publish']['ai_label_hashtag']}".strip(),
+             "published": {}, "attempts": 0}
+    ser["parts"].append(entry)
+    write_json(STATE, st)
     return entry
 
 

@@ -1,0 +1,22 @@
+{
+  "title": "Morgen war gestern",
+  "premise": "Elias (17) wacht jeden Morgen einen Tag FRÜHER auf – sein Leben läuft rückwärts. Am Anfang findet er es lustig, bis er merkt: In fünf Tagen erreicht er den Tag, an dem seine Mutter einen Unfall hatte. Er hat jetzt die Chance, ihn zu verhindern – aber jeder Versuch verändert etwas anderes. Sein kleiner Bruder Ben ist der Einzige, der ihm glaubt.",
+  "tone": "berührend, spannend, leise Momente zwischen Mutter und Sohn, innere Gedanken von Elias als Erzähler, jede Folge endet mit einem Cliffhanger",
+  "narrator_voice": "de-DE-FlorianMultilingualNeural",
+  "characters": [
+    {"id": "elias", "name": "Elias", "gender": "m", "height": 1.0, "voice": "de-DE-KillianNeural",
+     "look": "a 17-year-old teenage boy, slim, messy dark brown hair, tired brown eyes, wearing a dark green hoodie, grey jeans and white sneakers"},
+    {"id": "mama", "name": "Sabine (Mama)", "gender": "f", "height": 0.97, "voice": "de-DE-SeraphinaMultilingualNeural",
+     "look": "a 42-year-old woman with shoulder-length wavy auburn hair, kind tired green eyes, wearing a beige knitted cardigan over a white blouse, dark blue trousers"},
+    {"id": "ben", "name": "Ben", "gender": "child", "height": 0.62, "voice": "de-DE-GiselaNeural",
+     "look": "an 8-year-old boy with short blond hair, big blue eyes, freckles, wearing a yellow t-shirt with a small rocket print, blue shorts and red sneakers"},
+    {"id": "noah", "name": "Noah", "gender": "m", "height": 1.02, "voice": "de-DE-ConradNeural",
+     "look": "a 17-year-old teenage boy with short black curly hair, dark skin, friendly smile, wearing a red bomber jacket, black t-shirt and black jeans"}
+  ],
+  "locations": [
+    "a small cozy apartment kitchen in the morning with a wooden table, two chairs, a fridge with children's drawings, soft sunlight through a window",
+    "a teenage boy's small bedroom at night with an unmade bed, posters on the wall, a desk with a lamp and a window showing the city at night",
+    "a school hallway with blue lockers, a notice board and a long corridor, daytime",
+    "a narrow apartment building stairwell with a window, worn walls and a front door, evening light"
+  ]
+}

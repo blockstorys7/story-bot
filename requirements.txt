@@ -4,3 +4,5 @@ python-dotenv>=1.0
 edge-tts>=7.0
 pillow>=10.0
 json-repair>=0.30
+rembg>=2.0.50
+onnxruntime>=1.17

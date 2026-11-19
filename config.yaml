@@ -2,6 +2,8 @@
 #  AI Story Bot – Konfiguration
 # ---------------------------------------------------------------
 
+format: drama           # drama = gezeichnete 2D-Geschichten | roblox3d = Blender-Blockstadt
+start_series: morgen_war_gestern
 language: de            # Sprache von Erzählung & Untertiteln (de, en, ...)
 target_seconds: 78      # Ziel-Sprechlänge (Reels-API erlaubt max. 90 s)
 min_seconds: 62         # Video wird NIE kürzer (TikTok Creator Rewards zählt nur Videos > 1 min)
