@@ -1,0 +1,309 @@
+{
+  "lines": [
+    {
+      "speaker": "narrator",
+      "text": "Ich wachte auf. Und plötzlich stimmte einfach gar nichts mehr.",
+      "location": 1,
+      "present": [
+        "elias"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Gestern war noch Freitag. Heute zeigt mein Kalender: Mittwoch.",
+      "location": 1,
+      "present": [
+        "elias"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "elias",
+      "text": "Hä? Was ist hier los?",
+      "location": 1,
+      "present": [
+        "elias"
+      ],
+      "shot": "medium",
+      "focus": "elias"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Ich rieb mir die Augen, völlig verwirrt.",
+      "location": 1,
+      "present": [
+        "elias"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "elias",
+      "text": "Das Handy sagt... Mittwoch der Sechste?",
+      "location": 1,
+      "present": [
+        "elias"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Mein Herz schlug schneller. Mein Kopf dröhnte.",
+      "location": 1,
+      "present": [
+        "elias"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "elias",
+      "text": "Ich bin in der Zeit zurückgereist. Wie geht das?",
+      "location": 1,
+      "present": [
+        "elias"
+      ],
+      "shot": "medium",
+      "focus": "elias"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Ich rannte aus dem Zimmer, rein in die Küche.",
+      "location": 0,
+      "present": [
+        "elias"
+      ],
+      "shot": "wide",
+      "focus": "elias"
+    },
+    {
+      "speaker": "elias",
+      "text": "Mama? Ben?",
+      "location": 0,
+      "present": [
+        "elias"
+      ],
+      "shot": "medium",
+      "focus": "elias"
+    },
+    {
+      "speaker": "mama",
+      "text": "Morgen, Elias. Du bist ja schon wach.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama"
+      ],
+      "shot": "medium",
+      "focus": "mama"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Sie stand am Herd. Ihr Lächeln tat so weh.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama"
+      ],
+      "shot": "close",
+      "focus": "mama"
+    },
+    {
+      "speaker": "elias",
+      "text": "Mama, welcher Tag ist heute?",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "mama",
+      "text": "Mittwoch, Schatz. Hast du schlecht geschlafen?",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama"
+      ],
+      "shot": "medium",
+      "focus": "mama"
+    },
+    {
+      "speaker": "ben",
+      "text": "Elias hat einen Knall im Kopf!",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama",
+        "ben"
+      ],
+      "shot": "medium",
+      "focus": "ben"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Ben kicherte und biss in sein Brot.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama",
+        "ben"
+      ],
+      "shot": "close",
+      "focus": "ben"
+    },
+    {
+      "speaker": "elias",
+      "text": "Nein, Ben. Es ist einfach... unmöglich.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama",
+        "ben"
+      ],
+      "shot": "medium",
+      "focus": "elias"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Ich sah auf den Küchenkalender an der Wand.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama",
+        "ben"
+      ],
+      "shot": "medium",
+      "focus": "elias"
+    },
+    {
+      "speaker": "elias",
+      "text": "Der rote Kreis. Genau hier.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama",
+        "ben"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Fünf Tage noch bis zu ihrem Unfall.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama",
+        "ben"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "elias",
+      "text": "Mama, fahr bitte nicht weg am Sonntag.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "mama",
+      "text": "Warum sollte ich das nicht tun?",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama"
+      ],
+      "shot": "medium",
+      "focus": "mama"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Sie sah mich an. Völlig ahnungslos.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama"
+      ],
+      "shot": "close",
+      "focus": "mama"
+    },
+    {
+      "speaker": "elias",
+      "text": "Weil du sonst... weil etwas Schlimmes passiert.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "ben",
+      "text": "Ich helfe dir, Elias. Ich glaube dir.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama",
+        "ben"
+      ],
+      "shot": "medium",
+      "focus": "ben"
+    },
+    {
+      "speaker": "narrator",
+      "text": "Ben hielt plötzlich meine Hand fest.",
+      "location": 0,
+      "present": [
+        "elias",
+        "mama",
+        "ben"
+      ],
+      "shot": "close",
+      "focus": "ben"
+    },
+    {
+      "speaker": "elias",
+      "text": "Woher... weißt du das?",
+      "location": 0,
+      "present": [
+        "elias",
+        "ben"
+      ],
+      "shot": "close",
+      "focus": "elias"
+    },
+    {
+      "speaker": "ben",
+      "text": "Weil ich es gestern schon geträumt habe.",
+      "location": 0,
+      "present": [
+        "elias",
+        "ben"
+      ],
+      "shot": "close",
+      "focus": "ben"
+    }
+  ],
+  "caption": "Teil 1: Elias wacht plötzlich in der Vergangenheit auf – und sein kleiner Bruder weiß mehr, als er sollte. ⏳😱 #morgenwargestern #zeitreise #drama #tiktokgeschichten",
+  "hashtags": [
+    "morgenwargestern",
+    "zeitreise",
+    "drama",
+    "geschichten",
+    "familie"
+  ],
+  "summary": "Elias wacht unerklärlicherweise einen Tag früher auf und merkt, dass er in der Zeit zurückgereist ist. Während seine Mutter ahnungslos ist, überrascht sein kleiner Bruder Ben ihn mit dem Geständnis, davon geträumt zu haben."
+}
