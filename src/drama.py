@@ -28,6 +28,7 @@ VOICES = {  # kostenlose Microsoft-Neuralstimmen (edge-tts)
     "f": ["de-DE-SeraphinaMultilingualNeural", "de-DE-KatjaNeural", "de-DE-AmalaNeural", "de-AT-IngridNeural"],
     "child": ["de-DE-GiselaNeural"],
 }
+CHILD_FALLBACK = ("de-DE-KatjaNeural", "+55Hz", "+8%")  # helle Frauenstimme, höher gestimmt
 
 STYLE = ("2D digital illustration, hand-drawn storybook style, soft cel shading, warm muted colors, "
          "clean outlines, cozy, slightly melancholic mood")
@@ -160,13 +161,30 @@ def voice_map(bible) -> dict:
     return vm
 
 
-def tts_line(text: str, voice: str, dest: Path, rate="+6%", pitch="+0Hz"):
+def tts_line(text: str, voice: str, dest: Path, rate="+6%", pitch="+0Hz", gender="m"):
+    """Spricht eine Zeile. Fällt die Stimme aus, werden Ersatzstimmen probiert."""
     import edge_tts
 
-    async def run():
-        await edge_tts.Communicate(text, voice, rate=rate, pitch=pitch).save(str(dest))
-    retry(lambda: asyncio.run(run()), tries=4, wait=5)
-    return dest
+    def attempt(v, r, p):
+        async def run():
+            await edge_tts.Communicate(text, v, rate=r, pitch=p).save(str(dest))
+        retry(lambda: asyncio.run(run()), tries=2, wait=4)
+
+    options = [(voice, rate, pitch)]
+    if gender == "child":
+        options.append(CHILD_FALLBACK)
+    options += [(v, rate, pitch) for v in VOICES.get(gender if gender in ("m", "f") else "f", []) if v != voice]
+    options.append((VOICES["narrator"], rate, pitch))
+    last = None
+    for v, r, p in options:
+        try:
+            attempt(v, r, p)
+            if v != voice:
+                print(f"  (Ersatzstimme {v} statt {voice})", flush=True)
+            return dest
+        except Exception as e:  # noqa: BLE001
+            last = e
+    raise RuntimeError(f"Keine Stimme verfügbar: {last}")
 
 
 def duration(p: Path) -> float:
@@ -295,7 +313,7 @@ def generate_drama(cfg, bible, slug, part, total, history, work: Path) -> dict:
                                               words=int(sec * 2.3), maxw=int(cfg.get("max_seconds", 88) * 2.4),
                                               ending=ending))
         write_json(work / "script.json", script)
-    lines = [ln for ln in script["lines"] if ln.get("text", "").strip()]
+    lines = [ln for ln in script["lines"] if re.search(r"[A-Za-zÄÖÜäöüß0-9]", ln.get("text", ""))]
     valid = {c["id"] for c in bible["characters"]} | {"narrator"}
     for ln in lines:
         if ln.get("speaker") not in valid:
@@ -306,12 +324,14 @@ def generate_drama(cfg, bible, slug, part, total, history, work: Path) -> dict:
 
     print(f"Stimmen ({len(lines)} Zeilen) …", flush=True)
     vm = voice_map(bible)
+    genders = {c["id"]: c.get("gender", "m") for c in bible["characters"]}
     clips, times, t = [], [], 0.25
     for i, ln in enumerate(lines):
         p = work / f"line_{i:02d}.mp3"
         if not p.exists():
             v = vm.get(ln["speaker"], vm["narrator"])
-            tts_line(ln["text"], v, p, pitch="+25Hz" if v in VOICES["child"] else "+0Hz")
+            g = genders.get(ln["speaker"], "m")
+            tts_line(ln["text"], v, p, pitch="+25Hz" if g == "child" else "+0Hz", gender=g)
         d = duration(p)
         gap = 0.35 if i + 1 < len(lines) and lines[i + 1]["speaker"] != ln["speaker"] else 0.18
         clips.append((p, t))

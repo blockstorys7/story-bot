@@ -17,9 +17,9 @@ end_text_final: "ENDE"
 # "Upgrade"-Werte umstellen (bessere Figuren-Konsistenz + echte Animation).
 llm:
   provider: gemini                  # gratis | Upgrade: anthropic
-  model: gemini-flash-latest        # bei anthropic: claude-sonnet-5-5
+  model: gemini-flash-lite-latest   # schnell + am wenigsten überlastet | bei anthropic: claude-sonnet-5-5
   fallbacks:                        # werden der Reihe nach probiert, falls das Hauptmodell überlastet ist
-    - gemini:gemini-flash-lite-latest
+    - gemini:gemini-flash-latest
     - pollinations:openai
     - pollinations:mistral
 tts:

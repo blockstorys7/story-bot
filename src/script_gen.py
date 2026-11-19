@@ -75,7 +75,7 @@ def llm(cfg: dict, prompt: str) -> dict:
     for prov, model in chain:
         print(f"  Sprachmodell: {prov}/{model}")
         try:
-            return retry(lambda: parse_json(_call(prov, model, prompt)), tries=2, wait=20)
+            return retry(lambda: parse_json(_call(prov, model, prompt)), tries=2 if (prov, model) == chain[0] else 1, wait=20)
         except Exception as e:  # noqa: BLE001
             last = e
             print(f"  ! {prov}/{model} nicht verfügbar – nächstes Modell")
