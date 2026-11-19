@@ -312,6 +312,20 @@ def generate_drama(cfg, bible, slug, part, total, history, work: Path) -> dict:
                                               history="\n".join(history) or "(Anfang)", seconds=sec,
                                               words=int(sec * 2.3), maxw=int(cfg.get("max_seconds", 88) * 2.4),
                                               ending=ending))
+        maxw = int(cfg.get("max_seconds", 88) * 2.3)
+        for _ in range(2):
+            n = len(" ".join(ln.get("text", "") for ln in script.get("lines", [])).split())
+            if n <= maxw:
+                break
+            print(f"  Drehbuch zu lang ({n} Wörter) – wird gekürzt …", flush=True)
+            short = llm(cfg, "Kürze dieses Drehbuch auf höchstens " + str(int(sec * 2.2)) + " gesprochene Wörter. "
+                        "Streiche unwichtige Zeilen oder kürze Sätze, behalte Einstieg, Gefühl und Cliffhanger. "
+                        "Gleiches JSON-Format mit allen Feldern. Antworte NUR mit JSON.\n\n"
+                        + json.dumps(script, ensure_ascii=False))
+            if short.get("lines"):
+                for k in ("caption", "hashtags", "summary"):
+                    short.setdefault(k, script.get(k))
+                script = short
         write_json(work / "script.json", script)
     lines = [ln for ln in script["lines"] if re.search(r"[A-Za-zÄÖÜäöüß0-9]", ln.get("text", ""))]
     valid = {c["id"] for c in bible["characters"]} | {"narrator"}
