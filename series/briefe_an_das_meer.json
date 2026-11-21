@@ -1,0 +1,26 @@
+{
+  "title": "Briefe an das Meer",
+  "premise": "Eine junge Frau findet auf dem Dachboden ihres verstorbenen Vaters eine Kiste mit ungeöffneten Briefen, die sie selbst als Kind an das Meer geschrieben hatte – alle mit Antworten versehen, die sie nie erhalten hat. Sie begibt sich auf die Suche nach dem geheimnisvollen Absender, der ihr Leben im Geheimen geprägt hat.",
+  "tone": "Bodenständig, melancholisch, herzerwärmend und voller Hoffnung",
+  "characters": [
+    {
+      "id": "hannah",
+      "name": "Hannah",
+      "gender": "f",
+      "height": 1.0,
+      "look": "24 years old woman with shoulder-length wavy brown hair, wearing an oversized beige knit sweater and faded blue jeans, looking thoughtful"
+    },
+    {
+      "id": "johannes",
+      "name": "Johannes",
+      "gender": "m",
+      "height": 1.0,
+      "look": "72 years old man with weathered warm face, short grey hair, wearing a dark green wool jacket and a woolen scarf, carrying a wooden walking stick"
+    }
+  ],
+  "locations": [
+    "a dusty cluttered attic filled with old wooden boxes, warm sunlight streaming through a small circular window",
+    "a small cozy coastal café with wooden tables, steaming mugs of tea, and a large rain-streaked window overlooking the grey sea",
+    "a windy sandy beach under an overcast sky with weathered wooden beach chairs and crashing waves in the background"
+  ]
+}

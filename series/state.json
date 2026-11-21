@@ -1,5 +1,5 @@
 {
-  "active": "morgen_war_gestern",
+  "active": "briefe_an_das_meer",
   "series": {
     "morgen_war_gestern": {
       "parts": [
@@ -64,6 +64,18 @@
           "dir": "output/morgen_war_gestern/part_08",
           "summary": "Im großen Finale stellt Elias fest, dass er den Unfall seiner Mutter abwenden konnte. Er schließt sie überglücklich in die Arme, während die Zeit endlich wieder vorwärtsläuft.",
           "caption": "Morgen war gestern - Teil 8 (Finale)\n\n#morgenwargestern #tiktokdrama #finale #zeitreise #familie #aigenerated",
+          "published": {},
+          "attempts": 0
+        }
+      ]
+    },
+    "briefe_an_das_meer": {
+      "parts": [
+        {
+          "part": 1,
+          "dir": "output/briefe_an_das_meer/part_01",
+          "summary": "Hannah findet auf dem Dachboden ihres Vaters alte Kindheitsbriefe an das Meer, die mit unerwarteten, frisch geschriebenen Antworten versehen sind. Jemand hat ihre tiefsten Wünsche jahrelang gelesen und beantwortet.",
+          "caption": "Briefe an das Meer – Teil 1 🌊 Wer liest Kindenbriefe und antwortet darauf?\n\n#drama #geschichten #geheimnis #emotional #lesen #aigenerated",
           "published": {},
           "attempts": 0
         }
