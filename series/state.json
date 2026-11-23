@@ -138,7 +138,16 @@
       ]
     },
     "nimmt_die_zeit_stocher": {
-      "parts": []
+      "parts": [
+        {
+          "part": 1,
+          "dir": "output/nimmt_die_zeit_stocher/part_01",
+          "summary": "Die Geschichte wirft die Dank der Schüler, die mit einem rätselhaften Pendel mit dem Vergangenen verknüpft werden. Ein Unbekanntes i…",
+          "caption": "Teil 1: Die Uhr liegt nicht in der Zeit\n\n#TikTokDrama #Zeitreise #SchuleMitGeheimnis #aigenerated",
+          "published": {},
+          "attempts": 0
+        }
+      ]
     }
   }
 }
