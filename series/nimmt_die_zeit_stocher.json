@@ -1,0 +1,40 @@
+{
+  "title": "Nimmt die Zeit Stocher",
+  "premise": "Eine abgelegene Schule in den Bergen bietet fünf Jahre später den Vorführungen einer einzigen Klasse ein Rätsel, das die unsichtbare Grenze zwischen Vergangenheit und Gegenwart sprengt. Durch ein altes Pendel tauschen zwei Freundinnen Körper, und ihre Erinnerungen verschmelzen mit denen einer längst verstorbenen Lehrerin, die ein Familiengeheimnis barg. In jedem Teil von acht Episoden kommt ein neues Stück der Wahrheit ans Licht: ein verlorener Liebesbrief, ein geheimnisvoller Schatten, ein ungebändiger Mut. Die Mädchen müssen vertrauliche Geheimnisse entfesseln, die Freundschaft testen und am Ende festhalten, das Leben in jeder Form zu schätzen.\n\nDie Serie ist geschildert wie ein Gemälde, jeder Frame ein dramatischer Punkt, der die emotionale Intensität der Geschichte einfängt. Der Fokus liegt auf die Farbsprache der Rollen, echten Emotionen und symbolischer Rätsel.\n\nDies ist keine traditionell traggas‑Geschichte – es sind Figuren, die realistisch verankert sind, deren Beschreibungen am Stück bewegen. Es kommt zu Entscheidungen, die Sinnstiftungen in der Hall von Zweifeln — und hier noch von Hoffnung, die für alles übrig ist.\n\n",
+  "tone": "grounded, heartfelt, suspenseful",
+  "characters": [
+    {
+      "id": "A1",
+      "name": "Lena Ziegler",
+      "gender": "f",
+      "height": 1.45,
+      "look": "a late‑teen with messy brown hair, a faded denim jacket, and a charcoal‑gray hoodie. She carries a worn sketchbook that she opens with a sigh when the gravity of the clue hits."
+    },
+    {
+      "id": "B2",
+      "name": "Tim Becker",
+      "gender": "m",
+      "height": 1.78,
+      "look": "mid‑20s, short black hair and a crisp blue T‑shirt; he flaunts a silver watch that mirrors his inner component of time."
+    },
+    {
+      "id": "C3",
+      "name": "Mia Alrmann",
+      "gender": "child",
+      "height": 0.62,
+      "look": "a sprightly girl of nine, amber‑colored hair in pigtails; she rocks a pastel pink hoodie with a printed fox and carries a plastic pine-scented snowball holder."
+    },
+    {
+      "id": "D4",
+      "name": "Professor Holden",
+      "gender": "m",
+      "height": 1.85,
+      "look": "elderly with a white bearded face that's soft; wears a charcoal suit with a silver tie that matches the rings he keeps in his pocket."
+    }
+  ],
+  "locations": [
+    "a dimly lit school library with a greenish‑blue ambiance and an ancient brass clock tower"
+  ],
+  "3": "a creaking, dusty attic filled with faded ink pots and paint cans, the scent of bygone letters. At night, the wooden floor creaks under the weight of old secrets.\n\n",
+  "four": "the view from the rooftop, illuminated by moonlight with faint whispers of the underground tunnel that tracks Tungsten quarry. The air feels cool and electric."
+}

@@ -1,5 +1,5 @@
 {
-  "active": "briefe_an_das_meer",
+  "active": "nimmt_die_zeit_stocher",
   "series": {
     "morgen_war_gestern": {
       "parts": [
@@ -136,6 +136,9 @@
           "attempts": 0
         }
       ]
+    },
+    "nimmt_die_zeit_stocher": {
+      "parts": []
     }
   }
 }
