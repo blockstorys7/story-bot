@@ -1,0 +1,40 @@
+{
+  "title": "Echoes of the Folded Time",
+  "premise": "In the picturesque town of Rüterich, the residents discover a mysterious antique folding chair that, once sat in, swaps the sitter’s memories with that of a long‑lost relative. As the chair’s secret spreads, families wrestle with forgiveness, hidden loves, and a millennium‑old curse that threatens to crush the town’s bonds. The series unfolds in eight episodes, each a hand‑drawn chapter that blends heartfelt drama with pulse‑racing suspense, all told through vibrant, cinematic illustrations.",
+  "tone": "Grounded, tender, but with a cinematic edge of tension and intrigue",
+  "characters": [
+    {
+      "id": "v",
+      "name": "Vera Lehnert",
+      "gender": "f",
+      "height": 1.52,
+      "look": "late 30s, short dark hair, olive skin, always in a pastel floral dress and a knitted cardigan, copper earrings hanging over her left ear in soft light"
+    },
+    {
+      "id": "l",
+      "name": "Lukas Feldmann",
+      "gender": "m",
+      "height": 1.78,
+      "look": "mid‑20s, shoulder‑length auburn hair, freckled nose, sneakers with a faded comic book imprint, casual jacket in muted blues"
+    },
+    {
+      "id": "t",
+      "name": "Tanzler – the Chair",
+      "gender": "child",
+      "height": 0.45,
+      "look": "a wooden antique folding chair with a gold filigree frame, cream coloured cushion, and a faint glow that pulses when someone's memories seep through"
+    },
+    {
+      "id": "m",
+      "name": "Miretina",
+      "gender": "f",
+      "height": 0.68,
+      "look": "teenage, short silver hair in a messy ponytail, chalk white wristbands, a patched hoodie in violet and black, eyes that shift color with her emotions"
+    }
+  ],
+  "locations": [
+    "a secluded attic illuminated by a single yellow lamp, stacked with dusty encyclopedias and the silver folding chair",
+    "a bustling market square in Rüterich, painted with a faded mural of a family tree, its cobblestones worn by generations",
+    "the abandoned warehouse by the river, its concrete walls etched with graffiti, contrasts stark with a lone, flickering streetlamp"
+  ]
+}

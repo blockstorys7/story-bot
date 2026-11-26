@@ -1,5 +1,5 @@
 {
-  "active": "nimmt_die_zeit_stocher",
+  "active": "echoes_of_the_folded_time",
   "series": {
     "morgen_war_gestern": {
       "parts": [
@@ -200,6 +200,18 @@
           "dir": "output/nimmt_die_zeit_stocher/part_08",
           "summary": "Im großen Finale stoppt das Pendel und die Gruppe überwindet gemeinsam die dunkle Präsenz. Die Geheimnisse der Vergangenheit sind gelöst und die Freundschaft triumphiert.",
           "caption": "Teil 8 - Das große Finale von Nimmt die Zeit Stocher!\n\n#tictokdrama #finale #zeitstocher #emotional #aigenerated",
+          "published": {},
+          "attempts": 0
+        }
+      ]
+    },
+    "echoes_of_the_folded_time": {
+      "parts": [
+        {
+          "part": 1,
+          "dir": "output/echoes_of_the_folded_time/part_01",
+          "summary": "Vera setzt sich auf den geheimnisvollen Klappstuhl im Dachboden und verliert sofort ihre eigenen Erinnerungen. Plötzlich steht ein fremder Schatten an der Tür.",
+          "caption": "Teil 1: Der mysteriöse Stuhl verändert alles in Rüterich. Wer ist Vera wirklich? #EchoesOfTheFoldedTime #Drama #TikTokSeries #Geheimnis #Animation\n\n#EchoesOfTheFoldedTime #Drama #TikTokSeries #Geheimnis #Animation #aigenerated",
           "published": {},
           "attempts": 0
         }
