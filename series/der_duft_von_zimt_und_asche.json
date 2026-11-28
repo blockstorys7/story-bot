@@ -1,0 +1,33 @@
+{
+  "title": "Der Duft von Zimt und Asche",
+  "premise": "Eine junge Bäckerin erbt nach dem plötzlichen Tod ihres Vaters die alte, verschuldete Dorfbäckerei. Beim Renovieren findet sie alte, ungesendete Liebesbriefe und ein dunkles Familiengeheimnis, das ihre eigene Identität infrage stellt und sie zwingt, sich der Vergangenheit zu stellen.",
+  "tone": "Emotional, bodenständig, warmherzig und dramatisch",
+  "characters": [
+    {
+      "id": "hannah",
+      "name": "Hannah",
+      "gender": "f",
+      "height": 1.0,
+      "look": "A young woman in her mid-20s with messy dark brown hair tied in a loose bun, warm brown eyes, wearing a flour-dusted oversized beige knit sweater and dark jeans."
+    },
+    {
+      "id": "johan",
+      "name": "Johan",
+      "gender": "m",
+      "height": 1.0,
+      "look": "A man in his late 20s with short blonde hair, kind blue eyes, wearing a worn-out denim shirt with rolled-up sleeves and a leather apron."
+    },
+    {
+      "id": "martha",
+      "name": "Martha",
+      "gender": "f",
+      "height": 1.0,
+      "look": "An elderly woman in her 70s with silver-white curly hair, gentle wrinkles around her eyes, wearing a dark green cardigan and a floral apron."
+    }
+  ],
+  "locations": [
+    "a small worn-out bakery kitchen filled with flour dust, old wooden baking tables, and warm golden morning light shining through a dusty window",
+    "a cozy rustic attic room crammed with old cardboard boxes, wooden beams, and a single sunbeam illuminating floating dust motes",
+    "a quiet cobblestone village street in Germany at dusk, lined with traditional half-timbered houses and glowing amber street lamps"
+  ]
+}

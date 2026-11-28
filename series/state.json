@@ -1,5 +1,5 @@
 {
-  "active": "echoes_of_the_folded_time",
+  "active": "der_duft_von_zimt_und_asche",
   "series": {
     "morgen_war_gestern": {
       "parts": [
@@ -268,6 +268,18 @@
           "dir": "output/echoes_of_the_folded_time/part_08",
           "summary": "Vera erlangt im verlassenen Lagerhaus ihre Erinnerungen zurück. Gemeinsam mit Lukas scheint der Fluch besiegt, doch ein letztes Glühen des Stuhls lässt Zweifel offen.",
           "caption": "Teil 8 von 8: Das emotionale Finale! Ist der Fluch wirklich gebrochen? 🪑✨\n\n#EchoesOfTheFoldedTime #TikTokDrama #Animation #Finale #Gänsehaut #aigenerated",
+          "published": {},
+          "attempts": 0
+        }
+      ]
+    },
+    "der_duft_von_zimt_und_asche": {
+      "parts": [
+        {
+          "part": 1,
+          "dir": "output/der_duft_von_zimt_und_asche/part_01",
+          "summary": "Hannah findet beim Renovieren der geerbten Bäckerei alte Liebesbriefe und ein Foto, das alles verändert. Sie muss vor Johan verbergen, was sie gerade entdeckt hat.",
+          "caption": "Der Duft von Zimt und Asche – Teil 1 🕯️✨ Was hat Hannah auf dem Foto entdeckt?\n\n#drama #geheimnis #bäckerei #fyp #geschichten #aigenerated",
           "published": {},
           "attempts": 0
         }
